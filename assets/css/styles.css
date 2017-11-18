@@ -3,6 +3,64 @@ body {
 }
 
 h1 {
-
+  text-align: center;
+  padding: 20px;
+  font-size: 2em;
+  font-weight: bold;
 }
 
+/* Styles for user information modal */
+.usrInfo {
+  margin: 0px 20px;
+}
+
+#getUsrInfo {
+  width: 50%;
+  margin: 0 auto;
+  background-color: #cccccc;
+  border: 1px solid gray;
+  border-radius: 20px;
+}
+
+label[for=name] {
+  margin: 20px 20px 1px 20px;
+}
+
+label[for=address] {
+  margin: 7px 20px 1px 20px;
+}
+
+label[for=city] {
+  margin: 7px 10px 1px 20px;
+}
+
+label[for=state] {
+  margin: 7px 20px 1px 10px;
+}
+
+#name, #address,
+label[for=name],
+label[for=address] {
+  width: calc(100% - 40px);
+}
+
+#city, #state,
+label[for=city],
+label[for=state] {
+  width: calc(50% - 32px);
+}
+
+#city {
+  margin-right: 10px;
+}
+
+#state {
+  margin-left: 10px;
+}
+
+#getCandidates {
+  display: block;
+  margin: 20px auto;
+}
+
+/* ---------------------- */

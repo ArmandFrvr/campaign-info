@@ -5,14 +5,30 @@
   <title>Campaign Finance Information</title>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <!-- <link rel="stylesheet" type="text/css" href="reset.css"> -->
-  <link rel="stylesheet" type="text/css" href="styles.css">
+  <link rel="stylesheet" type="text/css" href="asssets/css/reset.css">
+  <link rel="stylesheet" type="text/css" href="assets/css/styles.css">
 </head>
 
 <body>
   <h1>Campaign Finance Information</h1>
-  <p>Put info here</p>
-  <button id="#get-info">Get Info</button>
+
+
+  <div id="getUsrInfo">
+
+    <label for="name">Name</label>
+    <input id="name" class="usrInfo" type="text">
+
+    <label for="address">Address</label>
+    <input id="address" class="usrInfo" type="text">
+
+    <label for="city">City</label>
+    <label for="state">State</label>
+    <input id="city" class="usrInfo" type="text">
+    <input id="state" class="usrInfo" type="text">
+
+    <button id="getCandidates">See Candidates</button>
+
+  </div>
 
 <script
   src="https://code.jquery.com/jquery-3.2.1.min.js"

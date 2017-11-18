@@ -18,7 +18,33 @@
 // User shouldn't have to open a modal, we want it all on the screen at once so they
 // can compare side by side with minimal clicking.
 
-$("#get-info").on("click", function() {
+
+
+
+
+
+
+
+$(document).ready(function() {
+
+
+
+
+
+
+
+
+
+});
+
+
+
+
+$("#getCandidates").on("click", function() {
+
+
+var civicURL = "https://www.googleapis.com/civicinfo/v2/voterinfo"
+
 
 
 
