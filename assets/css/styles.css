@@ -64,3 +64,39 @@ label[for=state] {
 }
 
 /* ---------------------- */
+
+#dataWrapper {
+  width: 90%;
+  padding: 20px;
+  margin: 20px auto;
+  border: 1px solid gray;
+  border-radius: 20px;
+}
+
+.election {
+
+}
+
+.electionName {
+
+}
+
+.electionDate {
+
+}
+
+.poll {
+
+}
+
+.candidate {
+
+}
+
+.candName{
+
+}
+
+.candParty {
+
+}

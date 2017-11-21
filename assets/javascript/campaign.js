@@ -1,22 +1,23 @@
 
+var civicURL = "https://www.googleapis.com/civicinfo/v2/";
+var civicKey = "AIzaSyAVPZRcm8AoSUyWjp_mguSDes1qudW_JpE";
 
-// Get user's location information
-  // State
-  // City
-  // More local?  Not sure what affects elections.
-  // Specific address affects school districts so we might need that.
+var electionURL = civicURL + "elections?key=" + civicKey;
+var voterInfoURL = civicURL + "voterinfo?key=" + civicKey;
 
-// Validate the location info
-// If it's bad, return an error
+var electionList = [];
+var candidateList = [];
 
-// If it's good, get the list of upcoming elections
-// It would be nice to have them sorted and labelled for us, state, and local elections
 
-// For each election, clicking on it should return the list of candidates.
-
-// Under each candidate we want to show where they're getting their $
-// User shouldn't have to open a modal, we want it all on the screen at once so they
-// can compare side by side with minimal clicking.
+// Get list of upcoming elections
+// Called before user has a chance to provide any input so it should be ready
+$.ajax({
+  url: electionURL,
+  method: "GET"
+  }).done(function(response) {
+  electionList = response.elections;
+  console.log(electionList);
+  });
 
 
 // Load candidate ID list from CSV file (needed for OpenSecrets calls)
@@ -48,34 +49,17 @@ $(document).ready(function() {
 
 });
 
-var electionList = [];
-var electionList2 = [];
+
 
 $("#getCandidates").on("click", function() {
 
-
-
-  var civicURL = "https://www.googleapis.com/civicinfo/v2/"
-  var civicKey = "AIzaSyAVPZRcm8AoSUyWjp_mguSDes1qudW_JpE";
-
-  var electionURL = civicURL + "elections?key=" + civicKey;
-  var voterInfoURL = civicURL + "voterinfo?key=" + civicKey;
-
+  // https://www.googleapis.com/civicinfo/v2/elections?key=AIzaSyAVPZRcm8AoSUyWjp_mguSDes1qudW_JpE
+  // https://www.googleapis.com/civicinfo/v2/voterinfo?key=AIzaSyAVPZRcm8AoSUyWjp_mguSDes1qudW_JpE&address=14442%20Grassmere%20Ln%2C%20Tustin%20CA&electionId=2000
   // var secretsURL = "";
   // var secretsKey = "0c3901123cb9b3216d43c9c18bf2e693"
-
   // var address = parseAddress();
 
-  // Get list of upcoming elections
-  $.ajax({
-    url: electionURL,
-    method: "GET"
-  }).done(function(response) {
-    electionList = response.elections;
-    console.log(electionList);
 
-
-  });
 
 // Need to call this once for each election listed in the first call
 // Might not return anything, in which case we don't want to display anything
@@ -94,19 +78,137 @@ $("#getCandidates").on("click", function() {
 // they have is for 2016 elections.  So this might not work for candidates not
 // currently in any public office.  be prepared to handle lots of null (missing) info.
 
-  $.ajax({
-    url: voterInfoURL,
-    method: "GET"
-  }).done(function(response) {
-    electionList2 = response.elections;
-    console.log(electionList);
+
+  // Get sanitized, URL-encoded address
+  var address = parseAddress();
+
+  // For each election in the list
+  for(var i = 0; i < electionList.length; i++) {
+    // If this election is one relevant to the user
+    if(isApplicable($("#state").val(), electionList[i].ocdDivisionId)) {
+      // Display the election info
+      var thisElection = $("<div>", {
+                            "class" : "election",
+                            "id" : electionList[i].id
+                          });
+      var electionName = $("<span>", {
+                            "class" : "electionName",
+                            "text" : electionList[i].name
+                          });
+      var electionDate = $("<span>", {
+                            "class" : "electionDate",
+                            "text" : electionList[i].electionDay
+                          });
+      thisElection.append(electionName);
+      thisElection.append(electionDate);
+
+      $("#dataWrapper").append(thisElection);
+
+      // Get the info for that election
+      $.ajax({
+        url: voterInfoURL + "&address=" + address + "&electionId=" + electionList[i],
+        method: "GET"
+      }).done(function(response) {
+
+        // Show their polling location info under the election name
+        var polls = response.pollingLocations;
+        for(var i = 0; i < polls.length; i++) {
+          var locationTxt = "Polling location: " + polls[i].address.line1 + ", " +
+                            polls[i].address.city + ", " + polls[i].address.state +
+                            " " + polls[i].address.zip + " | "
+                            + "Hours: " + polls[i].pollingHours;
+          var location = $("<div>", {
+                            "class" : "poll",
+                            "text" : locationTxt
+                          });
+          $("#dataWrapper").append(location);
+        }
+
+        var contests = response.contests;
+        // For each contest in this election
+        for(var i = 0; i < contests.length; i++) {
+          // Display the name of the contest (office that's up for election)
+          var office = $("<div>", {
+                          "class" : "office",
+                          "text" : contest[i].office
+                        });
+          $("#dataWrapper").append(office);
+
+          var candidates = contests[i].candidates;
+          // For each candidate running for office
+          for(var i = 0; i < candidates.length; i++) {
+            var candName = candidates[i].name;
+            var candParty = candidates[i].party;
+            var candURL = candidates[i].candidateUrl;
+            var socialMedia = candidates[i].channels; // array of social media types and links
+            // Display the candidates's info (name & party)
+            var candInfo = $("<div>", {
+                              "class" : "candiate"
+                            });
+            var cName = $("<span>", {
+                            "class" : "candName",
+                            "text" : candName
+                          });
+            var cParty = $("<span>", {
+                            "class" : "candParty",
+                            "text" : candParty
+                          });
+            candInfo.append(cName);
+            candInfo.append(cParty);
 
 
-  });
+            // Display links to their webpage and social media channels
+
+
+
+
+            // Here's where we make the ajax call to OpenSecrets to look for their info
+            //
+            //
+            //
+            //
+            //
+
+
+
+          }
+        }
+
+      });
+    }
+  }
+
+
+
+
 
 
 });
 
+// Since the VoterInfo API isn't behaving like it says it should, we have to
+// check each election in the list to see if the state matches the user's.
+// (API is requiring the electionId param even though it says it's optional)
+// Returns true if the user's state is found in the ocdDivisionId for an election
+// Currently only works with US and state elections due to a lack of data to
+// test local elections with.
+// divisionString is of the format "ocd-division/country:us/state:ca"
+function isApplicable(state, divisionString) {
+  var divisons = divisionString.split("/");
+  // False if the election is not in the US
+  if(divisions[1].substr(-2,2) != "us") {
+    return false;
+  }
+  // False if the state for this election isn't equal to the user's state
+  else if (divisions[2].substr(-2,2) != state) {
+    return false;
+  }
+  // When we have better data, add more conditions to check for more local divisions like
+  // cities, school districts, etc.  Don't know what they're called since there isn't any
+  // data in the test DB for these.
+  return true;
+}
+
+// Returns the address in a URL encoded string
 // Doesn't have to be in the $(document).ready() because not called until
 // user clicks the button to submit their info.
 function parseAddress() {
@@ -114,7 +216,6 @@ function parseAddress() {
   var city = $("#city").val().trim().replace(/[^a-zA-Z 0-9]+/g, '');
   var state = $("#state").val().trim().replace(/[^a-zA-Z 0-9]+/g, '');
   // var zip = $("#zip").val().trim().replace(/[^ 0-9]+/g, '');
-
   // If any of the required data is missing, just means we can't refine the search
 
   return encodeURIComponent(address + ", " + city + " " + state);
