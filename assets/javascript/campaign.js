@@ -128,6 +128,7 @@ $("#getCandidates").on("click", function() {
         }
 
         var contests = response.contests;
+        console.log(contests);
         // For each contest in this election
         for(var i = 0; i < contests.length; i++) {
           // Display the name of the contest (office that's up for election)
@@ -138,12 +139,14 @@ $("#getCandidates").on("click", function() {
           $("#dataWrapper").append(office);
 
           var candidates = contests[i].candidates;
+          console.log(candidates);
           // For each candidate running for office
-          for(var i = 0; i < candidates.length; i++) {
-            var candName = candidates[i].name;
-            var candParty = candidates[i].party;
-            var candURL = candidates[i].candidateUrl;
-            var socialMedia = candidates[i].channels; // array of social media types and links
+          for(var j = 0; candidates && j < candidates.length; j++) {
+            console.log(j);
+            var candName = candidates[j].name;
+            var candParty = candidates[j].party;
+            var candURL = candidates[j].candidateUrl;
+            var socialMedia = candidates[j].channels; // array of social media types and links
             // Display the candidates's info (name & party)
             var candInfo = $("<div>", {
                               "class" : "candiate"
