@@ -53,13 +53,15 @@ $(document).ready(function() {
 
 $("#getCandidates").on("click", function() {
 
+  event.preventDefault();
+
   // https://www.googleapis.com/civicinfo/v2/elections?key=AIzaSyAVPZRcm8AoSUyWjp_mguSDes1qudW_JpE
   // https://www.googleapis.com/civicinfo/v2/voterinfo?key=AIzaSyAVPZRcm8AoSUyWjp_mguSDes1qudW_JpE&address=14442%20Grassmere%20Ln%2C%20Tustin%20CA&electionId=2000
   // var secretsURL = "";
   // var secretsKey = "0c3901123cb9b3216d43c9c18bf2e693"
   // var address = parseAddress();
 
-
+  console.log("Clicked button");
 
 // Need to call this once for each election listed in the first call
 // Might not return anything, in which case we don't want to display anything
@@ -81,10 +83,11 @@ $("#getCandidates").on("click", function() {
 
   // Get sanitized, URL-encoded address
   var address = parseAddress();
-
+  console.log(address);
   // For each election in the list
   for(var i = 0; i < electionList.length; i++) {
     // If this election is one relevant to the user
+    console.log(i);
     if(isApplicable($("#state").val(), electionList[i].ocdDivisionId)) {
       // Display the election info
       var thisElection = $("<div>", {
@@ -106,7 +109,7 @@ $("#getCandidates").on("click", function() {
 
       // Get the info for that election
       $.ajax({
-        url: voterInfoURL + "&address=" + address + "&electionId=" + electionList[i],
+        url: voterInfoURL + "&address=" + address + "&electionId=" + electionList[i].id,
         method: "GET"
       }).done(function(response) {
 
@@ -130,7 +133,7 @@ $("#getCandidates").on("click", function() {
           // Display the name of the contest (office that's up for election)
           var office = $("<div>", {
                           "class" : "office",
-                          "text" : contest[i].office
+                          "text" : contests[i].office
                         });
           $("#dataWrapper").append(office);
 
@@ -193,13 +196,15 @@ $("#getCandidates").on("click", function() {
 // test local elections with.
 // divisionString is of the format "ocd-division/country:us/state:ca"
 function isApplicable(state, divisionString) {
-  var divisons = divisionString.split("/");
+  console.log(state);
+  console.log(divisionString);
+  var divisions = divisionString.split("/");
   // False if the election is not in the US
   if(divisions[1].substr(-2,2) != "us") {
     return false;
   }
   // False if the state for this election isn't equal to the user's state
-  else if (divisions[2].substr(-2,2) != state) {
+  else if (divisions[2] && divisions[2].substr(-2,2) != state) {
     return false;
   }
   // When we have better data, add more conditions to check for more local divisions like
