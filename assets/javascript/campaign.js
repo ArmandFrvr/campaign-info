@@ -140,6 +140,7 @@ $("#getCandidates").on("click", function() {
 
           var candidates = contests[i].candidates;
           console.log(candidates);
+
           // For each candidate running for office
           for(var j = 0; candidates && j < candidates.length; j++) {
             console.log(j);
@@ -161,7 +162,7 @@ $("#getCandidates").on("click", function() {
                           });
             candInfo.append(cName);
             candInfo.append(cParty);
-
+            $("#dataWrapper").append(candInfo);
 
             // Display links to their webpage and social media channels
 
