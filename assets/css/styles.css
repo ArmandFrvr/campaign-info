@@ -9,6 +9,16 @@ h1 {
   font-weight: bold;
 }
 
+h2 {
+  font-weight: bold;
+  font-size: 1.6em;
+}
+
+h3 {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
 /* Styles for user information modal */
 .usrInfo {
   margin: 0px 20px;
@@ -74,7 +84,15 @@ label[for=state] {
 }
 
 .election {
+  font-weight: bold;
+  background-color: #CCCCCC;
+  color: #0C35CA;
+  padding: 10px;
+}
 
+.election:nth-of-type(1) {
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
 }
 
 .electionName {
@@ -82,21 +100,38 @@ label[for=state] {
 }
 
 .electionDate {
-
+  font-size: 1.25em;
+  padding-top: 5px;
 }
 
 .poll {
+  background-color: #ffff99;
+  padding: 5px 5px 5px 10px;
+}
 
+.office {
+  /*background-color: #ccff99;*/
+  padding: 5px 5px 5px 20px;
+  font-weight: bold;
+}
+
+.officeWrapper {
+  border: 1px solid black;
+  border-radius: 20px;
 }
 
 .candidate {
+  padding-left: 40px;
+}
 
+.candidate:nth-of-type(odd) {
+  background-color: #f2f2f2;
 }
 
 .candName{
-
+  margin: 0px 10px 0px 0px;
 }
 
 .candParty {
-
+  margin: 0px 0px 0px 10px;
 }

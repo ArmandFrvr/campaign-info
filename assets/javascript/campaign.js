@@ -94,7 +94,7 @@ $("#getCandidates").on("click", function() {
                             "class" : "election",
                             "id" : electionList[i].id
                           });
-      var electionName = $("<span>", {
+      var electionName = $("<h2>", {
                             "class" : "electionName",
                             "text" : electionList[i].name
                           });
@@ -132,7 +132,7 @@ $("#getCandidates").on("click", function() {
         // For each contest in this election
         for(var i = 0; i < contests.length; i++) {
           // Display the name of the contest (office that's up for election)
-          var office = $("<div>", {
+          var office = $("<h3>", {
                           "class" : "office",
                           "text" : contests[i].office
                         });
@@ -150,7 +150,7 @@ $("#getCandidates").on("click", function() {
             var socialMedia = candidates[j].channels; // array of social media types and links
             // Display the candidates's info (name & party)
             var candInfo = $("<div>", {
-                              "class" : "candiate"
+                              "class" : "candidate"
                             });
             var cName = $("<span>", {
                             "class" : "candName",
@@ -162,7 +162,7 @@ $("#getCandidates").on("click", function() {
                           });
             candInfo.append(cName);
             candInfo.append(cParty);
-            $("#dataWrapper").append(candInfo);
+            $(dataWrapper).append(candInfo);
 
             // Display links to their webpage and social media channels
 
