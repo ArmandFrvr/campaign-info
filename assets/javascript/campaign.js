@@ -150,55 +150,63 @@ $("#getCandidates").on("click", function() {
 
         var contests = response.contests;
         console.log(contests);
+
         // For each contest in this election
         for(var i = 0; i < contests.length; i++) {
-          // Display the name of the contest (office that's up for election)
-          var office = $("<h3>", {
-                          "class" : "office",
-                          "text" : contests[i].office
-                        });
-          $("#dataWrapper").append(office);
 
-          var candidates = contests[i].candidates;
-          console.log(candidates);
+          // If this is actually a contest and not a proposition/referendum
+            // Sample dataset only has "General" and "Referendum".  Will need to
+            // verify this when the 2018 data is available & see if anything else
+            // needs to be inclded.
+          if(contests[i].type == "General") {
 
-          // For each candidate running for office
-          for(var j = 0; candidates && j < candidates.length; j++) {
-            console.log(j);
-            var candName = candidates[j].name;
-            var candParty = candidates[j].party;
-            var candURL = candidates[j].candidateUrl;
-            var socialMedia = candidates[j].channels; // array of social media types and links
-            // Display the candidates's info (name & party)
-            var candInfo = $("<div>", {
-                              "class" : "candidate"
+            // Display the name of the contest (office that's up for election)
+            var office = $("<h3>", {
+                            "class" : "office",
+                            "text" : contests[i].office
+                          });
+            $("#dataWrapper").append(office);
+
+            var candidates = contests[i].candidates;
+            console.log(candidates);
+
+            // For each candidate running for office
+            for(var j = 0; candidates && j < candidates.length; j++) {
+              var candName = candidates[j].name;
+              var candParty = candidates[j].party;
+              var candURL = candidates[j].candidateUrl;
+              var socialMedia = candidates[j].channels; // array of social media types and links
+              // Display the candidates's info (name & party)
+              var candInfo = $("<div>", {
+                                "class" : "candidate"
+                              });
+              var cName = $("<span>", {
+                              "class" : "candName",
+                              "text" : candName
                             });
-            var cName = $("<span>", {
-                            "class" : "candName",
-                            "text" : candName
-                          });
-            var cParty = $("<span>", {
-                            "class" : "candParty",
-                            "text" : candParty
-                          });
-            candInfo.append(cName);
-            candInfo.append(cParty);
-            $(dataWrapper).append(candInfo);
+              var cParty = $("<span>", {
+                              "class" : "candParty",
+                              "text" : candParty
+                            });
+              candInfo.append(cName);
+              candInfo.append(cParty);
+              $(dataWrapper).append(candInfo);
 
-            // Display links to their webpage and social media channels
+              // Display links to their webpage and social media channels
 
 
 
 
-            // Here's where we make the ajax call to OpenSecrets to look for their info
-            //
-            //
-            //
-            //
-            //
+              // Here's where we make the ajax call to OpenSecrets to look for their info
+              //
+              //
+              //
+              //
+              //
 
 
 
+            }
           }
         }
 
