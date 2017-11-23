@@ -116,15 +116,36 @@ $("#getCandidates").on("click", function() {
         // Show their polling location info under the election name
         var polls = response.pollingLocations;
         for(var i = 0; i < polls.length; i++) {
-          var locationTxt = "Polling location: " + polls[i].address.line1 + ", " +
-                            polls[i].address.city + ", " + polls[i].address.state +
-                            " " + polls[i].address.zip + " | "
-                            + "Hours: " + polls[i].pollingHours;
-          var location = $("<div>", {
-                            "class" : "poll",
-                            "text" : locationTxt
-                          });
-          $("#dataWrapper").append(location);
+
+          // If there is an address, display it
+          if(polls[i].address.line1 != "") {
+            var pollingLocation = $("<div>", {
+                                    "class" : "poll"
+                                   });
+            var locationLbl = $("<span>", {
+                                "class" : "pollLbl",
+                                "text" : "Polling location: "
+                                });
+            var locationTxt = polls[i].address.line1 + ", " +
+                              polls[i].address.city + ", " + polls[i].address.state +
+                              " " + polls[i].address.zip;
+
+            pollingLocation.append(locationLbl);
+            pollingLocation.append(locationTxt);
+
+            // If the hours are known, display them also
+            if(polls[i].pollingHours != "") {
+              var hoursLbl = $("<span>", {
+                              "class" : "pollLbl",
+                              "text" : "Hours: "
+                              });
+              pollingLocation.append(" | ");
+              pollingLocation.append(hoursLbl);
+              pollingLocation.append(polls[i].pollingHours);
+            }
+
+            $("#dataWrapper").append(pollingLocation);
+          }
         }
 
         var contests = response.contests;

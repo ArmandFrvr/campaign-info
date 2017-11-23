@@ -109,6 +109,10 @@ label[for=state] {
   padding: 5px 5px 5px 10px;
 }
 
+.pollLbl {
+  font-weight: bold;
+}
+
 .office {
   /*background-color: #ccff99;*/
   padding: 5px 5px 5px 20px;
