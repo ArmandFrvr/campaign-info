@@ -83,11 +83,11 @@ $("#getCandidates").on("click", function() {
 
   // Get sanitized, URL-encoded address
   var address = parseAddress();
-  console.log(address);
+
   // For each election in the list
   for(var i = 0; i < electionList.length; i++) {
+
     // If this election is one relevant to the user
-    console.log(i);
     if(isApplicable($("#state").val(), electionList[i].ocdDivisionId)) {
       // Display the election info
       var thisElection = $("<div>", {
@@ -190,9 +190,54 @@ $("#getCandidates").on("click", function() {
                             });
               candInfo.append(cName);
               candInfo.append(cParty);
-              $(dataWrapper).append(candInfo);
 
-              // Display links to their webpage and social media channels
+              // Display link to their website
+              if(!!candURL) {
+                // Put it somewhere
+
+
+
+              }
+
+              // Display links to their social media channels
+              if(!!socialMedia) {
+                console.log("smoooooooo");
+                console.log(socialMedia);
+                var cSocial = $("<span>", { // Social media span
+                "class" : "candSocial",
+                });
+
+                for(var k = 0; k < socialMedia.length; k++) {
+                  var smIcon = (function (smType) {
+                                  switch(smType) {
+                                    case "Twitter":
+                                      return $('<i class="fa fa-twitter"><span class="accessible">'
+                                       + candName + '\'s Twitter</span></i>');
+                                    case "YouTube":
+                                      return $('<i class="fa fa-youtube"><span class="accessible">'
+                                       + candName + '\'s YouTube</span></i>');
+                                    case "Facebook":
+                                      return $('<i class="fa fa-facebook"><span class="accessible">'
+                                       + candName + '\'s Facebook</span></i>');
+                                    case "GooglePlus":
+                                      return $('<i class="fa fa-google-plus"><span class="accessible">'
+                                       + candName + '\'s Google Plus</span></i>');
+                                    default:
+                                      return "";
+                                  }
+                                })(socialMedia[k].type);
+                  var smLink = $("<a>", {
+                                  "href" : socialMedia[k].id,
+                                  "class" : "smLink",
+                                  "target" : "_blank"
+                                });
+                  smLink.append(smIcon);
+                  cSocial.append(smLink);
+                }
+                candInfo.append(cSocial);
+              }
+
+
 
 
 
@@ -205,7 +250,7 @@ $("#getCandidates").on("click", function() {
               //
 
 
-
+              $(dataWrapper).append(candInfo);
             }
           }
         }

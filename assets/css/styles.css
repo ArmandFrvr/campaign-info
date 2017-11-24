@@ -125,7 +125,7 @@ label[for=state] {
 }
 
 .candidate {
-  padding-left: 40px;
+  padding-left: 30px;
 }
 
 .candidate:nth-of-type(odd) {
@@ -133,9 +133,35 @@ label[for=state] {
 }
 
 .candName{
-  margin: 0px 10px 0px 0px;
+  display: inline-block;
+  margin: 0px 10px;
+  width: 200px;
+
 }
 
 .candParty {
-  margin: 0px 0px 0px 10px;
+  display: inline-block;
+  margin: 0px 10px;
+  width: 200px;
+}
+
+.candSocial {
+  display: inline-block;
+  width: 200px;
+
+}
+
+.smLink {
+  padding: 10px;
+}
+
+/* Offscreen text for screen readers */
+/* Used for "alt text" for FontAwesome icons */
+.accessible {
+  position: absolute !important;
+  top: auto;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
