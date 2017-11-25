@@ -61,28 +61,40 @@ $("#getCandidates").on("click", function() {
   // var secretsKey = "0c3901123cb9b3216d43c9c18bf2e693"
   // var address = parseAddress();
 
-  console.log("Clicked button");
-
-// Need to call this once for each election listed in the first call
-// Might not return anything, in which case we don't want to display anything
-// but if there are stuff in response.contests then we need to display election.name
-// election.electionDay, and for each item in contests
-// we need to show contests[i].office, contests[i].district.name,
-// for each candidate of that contest
-// show contests[i].candidates[j].name, contests[i].candidates[j].party
-// candidate website in contests[i].candidates[j].candidateURL
-// social media links
-// list of links in contests[i].candidates[j].channels[y].type (eg "Facebook")
-// and the url in contests[i].candidates[j].channels[y].id ("facebook.com/jerrybrown")
-
-// so all we have is the candidate name to look them up on opensecrets
-// can pull their CRP_ID from the bulk data spreadsheet, but the most recent data
-// they have is for 2016 elections.  So this might not work for candidates not
-// currently in any public office.  be prepared to handle lots of null (missing) info.
 
 
-  // Get sanitized, URL-encoded address
+  // Hide modal
+  $("#getUsrInfo").css("display", "none");
+
+  // Display the data.  Putting it here so it will start to load sooner for people on stupidly
+  // slow connections.  Could move to end if we wanted to wait until it was all there.
+  $("#addressInfo").css("display", "block");
+  $("#dataWrapper").css("display", "block");
+
+  // Need to call this once for each election listed in the first call
+  // Might not return anything, in which case we don't want to display anything
+  // but if there are stuff in response.contests then we need to display election.name
+  // election.electionDay, and for each item in contests
+  // we need to show contests[i].office, contests[i].district.name,
+  // for each candidate of that contest
+  // show contests[i].candidates[j].name, contests[i].candidates[j].party
+  // candidate website in contests[i].candidates[j].candidateURL
+  // social media links
+  // list of links in contests[i].candidates[j].channels[y].type (eg "Facebook")
+  // and the url in contests[i].candidates[j].channels[y].id ("facebook.com/jerrybrown")
+
+  // so all we have is the candidate name to look them up on opensecrets
+  // can pull their CRP_ID from the bulk data spreadsheet, but the most recent data
+  // they have is for 2016 elections.  So this might not work for candidates not
+  // currently in any public office.  be prepared to handle lots of null (missing) info.
+
+
+  // Get sanitized address
   var address = parseAddress();
+  // Display it on the next screen
+  $("#myAddress").text(address);
+  // URL-encode the address to get it ready for the api call
+  address = encodeURIComponent(address);
 
   // For each election in the list
   for(var i = 0; i < electionList.length; i++) {
@@ -123,7 +135,7 @@ $("#getCandidates").on("click", function() {
                                     "class" : "poll"
                                    });
             var locationLbl = $("<span>", {
-                                "class" : "pollLbl",
+                                "class" : "lbl",
                                 "text" : "Polling location: "
                                 });
             var locationTxt = polls[i].address.line1 + ", " +
@@ -136,7 +148,7 @@ $("#getCandidates").on("click", function() {
             // If the hours are known, display them also
             if(polls[i].pollingHours != "") {
               var hoursLbl = $("<span>", {
-                              "class" : "pollLbl",
+                              "class" : "lbl",
                               "text" : "Hours: "
                               });
               pollingLocation.append(" | ");
@@ -253,8 +265,12 @@ $("#getCandidates").on("click", function() {
               $(dataWrapper).append(candInfo);
             }
           }
-        }
 
+        }
+        // // Display the data
+        // $("#dataWrapper").css("display", "block");
+        // // Let users pick a different address
+        // $("#restart").css("display", "block");
       });
     }
   }
@@ -264,6 +280,20 @@ $("#getCandidates").on("click", function() {
 
 
 
+});
+
+
+// Start over using a different address
+$("#changeAddr").on("click", function() {
+  // Hide and clear candidate info
+  $("#dataWrapper").css("display", "none");
+  $("#dataWrapper").empty();
+  // Hide address info until there's a new one
+  $("#addressInfo").css("display", "none");
+  // Clear old address values
+  $(".usrInfo").val("");
+  // Display the address dialog again
+  $("#getUsrInfo").css("display", "block");
 });
 
 // Since the VoterInfo API isn't behaving like it says it should, we have to
@@ -297,9 +327,9 @@ function isApplicable(state, divisionString) {
 function parseAddress() {
   var address = $("#address").val().trim().replace(/[^a-zA-Z 0-9]+/g, '');
   var city = $("#city").val().trim().replace(/[^a-zA-Z 0-9]+/g, '');
-  var state = $("#state").val().trim().replace(/[^a-zA-Z 0-9]+/g, '');
+  var state = $("#state option:selected").text().trim().replace(/[^a-zA-Z 0-9]+/g, '');
   // var zip = $("#zip").val().trim().replace(/[^ 0-9]+/g, '');
   // If any of the required data is missing, just means we can't refine the search
 
-  return encodeURIComponent(address + ", " + city + " " + state);
+  return address + ", " + city + ", " + state;
 }

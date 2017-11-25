@@ -4,7 +4,7 @@ body {
 
 h1 {
   text-align: center;
-  padding: 20px;
+  padding: 18px;
   font-size: 2em;
   font-weight: bold;
 }
@@ -81,6 +81,21 @@ label[for=state] {
   margin: 20px auto;
   border: 1px solid gray;
   border-radius: 20px;
+  display: none;  /* Don't display until after there's data */
+}
+
+#addressInfo {
+  display: none;
+  padding: 10px 20px;
+}
+
+#changeAddr {
+  background-color: white;
+  border: none;
+  color: blue;
+  text-decoration: underline;
+  padding-left: 10px;
+  font-size: .8em;
 }
 
 .election {
@@ -109,7 +124,7 @@ label[for=state] {
   padding: 5px 5px 5px 10px;
 }
 
-.pollLbl {
+.lbl {
   font-weight: bold;
 }
 
