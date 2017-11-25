@@ -42,11 +42,6 @@ $(document).ready(function() {
 
 
 
-
-
-
-
-
 });
 
 
@@ -204,19 +199,25 @@ $("#getCandidates").on("click", function() {
               candInfo.append(cParty);
 
               // Display link to their website
+              var cURL = $("<span>"); // Candidate URL span
               if(!!candURL) {
-                // Put it somewhere
-
-
-
+                cURL.attr("class", "candURL");
+                // Need to make the link
+                var cLink = $("<a>", {
+                  "href" : candURL,
+                  "text" : formatURL(candURL);
+                });
               }
+              else {
+                cURL.attr("class", "spacer");   // if no url, make a placeholder for spacing
+              }
+              candInfo.append(cURL);
 
               // Display links to their social media channels
               if(!!socialMedia) {
-                console.log("smoooooooo");
-                console.log(socialMedia);
+
                 var cSocial = $("<span>", { // Social media span
-                "class" : "candSocial",
+                "class" : "candSocial"
                 });
 
                 for(var k = 0; k < socialMedia.length; k++) {
@@ -265,12 +266,7 @@ $("#getCandidates").on("click", function() {
               $(dataWrapper).append(candInfo);
             }
           }
-
         }
-        // // Display the data
-        // $("#dataWrapper").css("display", "block");
-        // // Let users pick a different address
-        // $("#restart").css("display", "block");
       });
     }
   }
@@ -308,7 +304,7 @@ function isApplicable(state, divisionString) {
   console.log(divisionString);
   var divisions = divisionString.split("/");
   // False if the election is not in the US
-  if(divisions[1].substr(-2,2) != "us") {
+  if(divisions[1].substr(-2, 2) != "us") {
     return false;
   }
   // False if the state for this election isn't equal to the user's state
@@ -332,4 +328,13 @@ function parseAddress() {
   // If any of the required data is missing, just means we can't refine the search
 
   return address + ", " + city + ", " + state;
+}
+
+// Returns pretty-print URL
+function formatURL(url) {
+  var tempURL = url.replace("http://", "");
+  if(tempURL.substr(-1, 1) === '/') {
+    tempURL = tempURL.substr(1, tempURL.length - 1);
+  }
+  return tempURL;
 }

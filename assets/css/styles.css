@@ -166,6 +166,16 @@ label[for=state] {
 
 }
 
+.candURL {
+  display: inline-block;
+  width: 200px;
+}
+
+.spacer { /* Must be same width as candURL */
+  display: inline-block;
+  width: 200px;
+}
+
 .smLink {
   padding: 10px;
 }
