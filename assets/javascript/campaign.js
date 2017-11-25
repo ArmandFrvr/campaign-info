@@ -205,7 +205,8 @@ $("#getCandidates").on("click", function() {
                 // Need to make the link
                 var cLink = $("<a>", {
                   "href" : candURL,
-                  "text" : formatURL(candURL);
+                  "text" : formatURL(candURL),
+                  "target" : "_blank";
                 });
               }
               else {
@@ -332,7 +333,7 @@ function parseAddress() {
 
 // Returns pretty-print URL
 function formatURL(url) {
-  var tempURL = url.replace("http://", "");
+  var tempURL = url.replace("http://www.", "");
   if(tempURL.substr(-1, 1) === '/') {
     tempURL = tempURL.substr(1, tempURL.length - 1);
   }

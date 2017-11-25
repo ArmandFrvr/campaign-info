@@ -1,5 +1,9 @@
 body {
+  font-family: 'Karla', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+}
 
+h1, h2, h3 {
+  font-family: 'Raleway', 'Georgia', Times, Times New Roman, serif;
 }
 
 h1 {
@@ -174,6 +178,12 @@ label[for=state] {
 .spacer { /* Must be same width as candURL */
   display: inline-block;
   width: 200px;
+}
+
+@media (max-width: 500px) {  /* Or whatever our mobile width is */
+  .spacer {
+    display: none;  /* Don't display width spacers on mobile */
+  }
 }
 
 .smLink {
