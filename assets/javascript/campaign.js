@@ -339,3 +339,18 @@ function formatURL(url) {
   }
   return tempURL;
 }
+
+// Returns the candidate's CID if found in the list
+// If not found, returns 0
+function getCID(name, state, party) {
+
+  // Import data from xls to array of objects
+    // Parse name into first and last, ditch anything after that (second space or comma)
+    // since it might not match what's in the Civic API
+  // "CID" field starts on B15
+
+  // Try a binary search to get the name faster
+    // Get first, middle, last values
+    // Make a recursive function to do it
+
+}
