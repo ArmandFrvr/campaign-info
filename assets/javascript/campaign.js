@@ -19,20 +19,15 @@ $.ajax({
   console.log(electionList);
   });
 
-
-// Load candidate ID list from CSV file (needed for OpenSecrets calls)
-// $.ajax({
-//     url: "pathto/filename.csv",
-//     async: false,
-//     success: function (csvd) {
-//         data = $.csv.toArrays(csvd);
-//     },
-//     dataType: "text",
-//     complete: function () {
-//         // call a function on complete
-//     }
-// });
-
+// Load candidate ID list from XLS file (needed for OpenSecrets calls)
+alasql.promise('SELECT [B] as CID, [C] as CRPName, [D] as party, [E] as distID, [F] as FECID ' +
+                'FROM XLS("data/CRP_IDs.xls",{sheetid:"Candidate IDs - 2016"}) ' +
+                'WHERE [F] is not null')
+        .then(function(data) {
+          console.log(data);
+        }).catch(function(err) {
+          console.log("Error: ", err);
+        });
 
 // https://www.opensecrets.org/api/?method=getOrgs&org=Clinton&apikey=0c3901123cb9b3216d43c9c18bf2e693
 
@@ -206,7 +201,7 @@ $("#getCandidates").on("click", function() {
                 var cLink = $("<a>", {
                   "href" : candURL,
                   "text" : formatURL(candURL),
-                  "target" : "_blank";
+                  "target" : "_blank"
                 });
               }
               else {
