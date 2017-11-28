@@ -51,8 +51,6 @@ $("#getCandidates").on("click", function() {
   // var secretsKey = "0c3901123cb9b3216d43c9c18bf2e693"
   // var address = parseAddress();
 
-
-
   // Hide modal
   $("#getUsrInfo").css("display", "none");
 
@@ -61,35 +59,17 @@ $("#getCandidates").on("click", function() {
   $("#addressInfo").css("display", "block");
   $("#dataWrapper").css("display", "block");
 
-  // Need to call this once for each election listed in the first call
-  // Might not return anything, in which case we don't want to display anything
-  // but if there are stuff in response.contests then we need to display election.name
-  // election.electionDay, and for each item in contests
-  // we need to show contests[i].office, contests[i].district.name,
-  // for each candidate of that contest
-  // show contests[i].candidates[j].name, contests[i].candidates[j].party
-  // candidate website in contests[i].candidates[j].candidateURL
-  // social media links
-  // list of links in contests[i].candidates[j].channels[y].type (eg "Facebook")
-  // and the url in contests[i].candidates[j].channels[y].id ("facebook.com/jerrybrown")
-
-  // so all we have is the candidate name to look them up on opensecrets
-  // can pull their CRP_ID from the bulk data spreadsheet, but the most recent data
-  // they have is for 2016 elections.  So this might not work for candidates not
-  // currently in any public office.  be prepared to handle lots of null (missing) info.
-
-
   // Get sanitized address
   var address = parseAddress();
-  // Display it on the next screen
   $("#myAddress").text(address);
+
   // URL-encode the address to get it ready for the api call
   address = encodeURIComponent(address);
 
   // For each election in the list
   for(var i = 0; i < electionList.length; i++) {
 
-    // If this election is one relevant to the user
+    // If this election is one relevant to the user (based on their address)
     if(isApplicable($("#state").val(), electionList[i].ocdDivisionId)) {
       // Display the election info
       var thisElection = $("<div>", {
@@ -109,7 +89,7 @@ $("#getCandidates").on("click", function() {
 
       $("#dataWrapper").append(thisElection);
 
-      // Get the info for that election
+      // Get detiled info for that election (polling location, contests, candidates)
       $.ajax({
         url: voterInfoURL + "&address=" + address + "&electionId=" + electionList[i].id,
         method: "GET"
