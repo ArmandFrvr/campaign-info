@@ -253,13 +253,18 @@ $("#getCandidates").on("click", function() {
 
 
 
-
+/*
               // Here's where we make the ajax call to OpenSecrets to look for their info
-              //
-              //
-              //
-              //
-              //
+var oSapiKey = "8dacce829b4fc0b4b9a29b711149324c"
+var oURL = "https://www.opensecrets.org/api/?method=candContrib&cid=H4LA05221&cycle=2016&apikey="
+var oSapiURL = oURL + oSapiKey
+$.ajax({
+  url: oSapiURL,
+  method: "GET"
+  }).done(function(response) {
+  electionList = response.elections;
+  console.log(electionList);
+  });*/
 
 
               $(dataWrapper).append(candInfo);
