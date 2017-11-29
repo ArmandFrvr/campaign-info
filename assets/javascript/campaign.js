@@ -340,13 +340,9 @@ function parseAddress() {
 
 // Returns pretty-print URL
 function formatURL(url) {
-  console.log("URL: " + url);
   var tempURL = url.replace("http://", "").replace("www.", "").replace(/[^/]+$/, "");
-  console.log("tempURL: " + tempURL);
   if(tempURL.substr(-1, 1) === '/') {
-
     tempURL = tempURL.substr(0, tempURL.length - 1);
-    console.log("tempAftr: " + tempURL);
   }
   return tempURL;
 }
