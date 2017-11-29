@@ -10,6 +10,9 @@ var candidateList = [];
 
 var CRPIDs = [];
 
+var secretsURL = "https://www.opensecrets.org/api/";
+var secretsKey = "0c3901123cb9b3216d43c9c18bf2e693";
+var candContribURL = secretsURL + "?method=candContrib&apikey=" + secretsKey + "&output=json"
 
 // Get list of upcoming elections
 // Called before user has a chance to provide any input so it should be ready
@@ -32,9 +35,6 @@ alasql.promise('SELECT [B] as CID, [C] as CRPName, [D] as party, [E] as distID, 
           console.log("Error: ", err);
         });
 
-// https://www.opensecrets.org/api/?method=getOrgs&org=Clinton&apikey=0c3901123cb9b3216d43c9c18bf2e693
-
-
 $(document).ready(function() {
 
 
@@ -43,16 +43,9 @@ $(document).ready(function() {
 });
 
 
-
 $("#getCandidates").on("click", function(event) {
 
   event.preventDefault();
-
-  // https://www.googleapis.com/civicinfo/v2/elections?key=AIzaSyAVPZRcm8AoSUyWjp_mguSDes1qudW_JpE
-  // https://www.googleapis.com/civicinfo/v2/voterinfo?key=AIzaSyAVPZRcm8AoSUyWjp_mguSDes1qudW_JpE&address=14442%20Grassmere%20Ln%2C%20Tustin%20CA&electionId=2000
-  // var secretsURL = "";
-  // var secretsKey = "0c3901123cb9b3216d43c9c18bf2e693"
-  // var address = parseAddress();
 
   // Hide modal
   $("#getUsrInfo").css("display", "none");
@@ -239,8 +232,6 @@ $("#getCandidates").on("click", function(event) {
               }
 
 
-              // LINK BROKEN-- NEED TO LOOK AT
-
 
 
               // Here's where we make the ajax call to OpenSecrets to look for their info
@@ -251,10 +242,10 @@ $("#getCandidates").on("click", function(event) {
               //
 
               // Get the OpenSecrets ID
-              var CID;
+              // Simple call without checking for combined names or states or anything
               var CID = getCID(candName, candParty);
               // var tempState = electionList[i].ocdDivisionId.split("/");
-
+              // var CID;
               // // If this is a state or local election, pass over the name of the state
               // // in case of a name conflict.
               // if(tempState[2]) {
@@ -264,10 +255,25 @@ $("#getCandidates").on("click", function(event) {
               //   CID = getCID(candName, candParty);
               // }
 
+              // If there's a / or & in the name, it's two names (several states have "Governor & Lt. Gvn'r" on the
+              // same ticket).  In these cases we're going to have to find two different CIDs (CID and CID2).
 
-  // If there's a / or & in the name, it's two names (several states have "Governor & Lt. Gvn'r" on the
-  // same ticket).  In these cases we're going to have to find two different CIDs (CID and CID2).
+              // Make API call to OpenSecrets
 
+
+              $.ajax({
+                url: candContribURL + "&cid=" + CID,
+                method: "GET"
+                }).done(function(response) {
+                  console.log("AAAAA");
+                  console.log(response);
+
+
+
+
+
+
+                });
 
 
 
