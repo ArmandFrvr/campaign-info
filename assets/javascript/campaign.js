@@ -8,6 +8,8 @@ var voterInfoURL = civicURL + "voterinfo?key=" + civicKey;
 var electionList = [];
 var candidateList = [];
 
+var CRPIDs = [];
+
 
 // Get list of upcoming elections
 // Called before user has a chance to provide any input so it should be ready
@@ -19,20 +21,16 @@ $.ajax({
   console.log(electionList);
   });
 
-
-// Load candidate ID list from CSV file (needed for OpenSecrets calls)
-// $.ajax({
-//     url: "pathto/filename.csv",
-//     async: false,
-//     success: function (csvd) {
-//         data = $.csv.toArrays(csvd);
-//     },
-//     dataType: "text",
-//     complete: function () {
-//         // call a function on complete
-//     }
-// });
-
+// Load candidate ID list from XLS file (needed for OpenSecrets calls)
+alasql.promise('SELECT [B] as CID, [C] as CRPName, [D] as party, [E] as distID, [F] as FECID ' +
+                'FROM XLS("data/CRP_IDs.xls",{sheetid:"Candidate IDs - 2016"}) ' +
+                'WHERE [F] is not null')
+        .then(function(data) {
+          CRPIDs = data;
+          console.log(CRPIDs);
+        }).catch(function(err) {
+          console.log("Error: ", err);
+        });
 
 // https://www.opensecrets.org/api/?method=getOrgs&org=Clinton&apikey=0c3901123cb9b3216d43c9c18bf2e693
 
@@ -42,16 +40,11 @@ $(document).ready(function() {
 
 
 
-
-
-
-
-
 });
 
 
 
-$("#getCandidates").on("click", function() {
+$("#getCandidates").on("click", function(event) {
 
   event.preventDefault();
 
@@ -61,8 +54,6 @@ $("#getCandidates").on("click", function() {
   // var secretsKey = "0c3901123cb9b3216d43c9c18bf2e693"
   // var address = parseAddress();
 
-
-
   // Hide modal
   $("#getUsrInfo").css("display", "none");
 
@@ -71,35 +62,17 @@ $("#getCandidates").on("click", function() {
   $("#addressInfo").css("display", "block");
   $("#dataWrapper").css("display", "block");
 
-  // Need to call this once for each election listed in the first call
-  // Might not return anything, in which case we don't want to display anything
-  // but if there are stuff in response.contests then we need to display election.name
-  // election.electionDay, and for each item in contests
-  // we need to show contests[i].office, contests[i].district.name,
-  // for each candidate of that contest
-  // show contests[i].candidates[j].name, contests[i].candidates[j].party
-  // candidate website in contests[i].candidates[j].candidateURL
-  // social media links
-  // list of links in contests[i].candidates[j].channels[y].type (eg "Facebook")
-  // and the url in contests[i].candidates[j].channels[y].id ("facebook.com/jerrybrown")
-
-  // so all we have is the candidate name to look them up on opensecrets
-  // can pull their CRP_ID from the bulk data spreadsheet, but the most recent data
-  // they have is for 2016 elections.  So this might not work for candidates not
-  // currently in any public office.  be prepared to handle lots of null (missing) info.
-
-
   // Get sanitized address
   var address = parseAddress();
-  // Display it on the next screen
   $("#myAddress").text(address);
+
   // URL-encode the address to get it ready for the api call
   address = encodeURIComponent(address);
 
   // For each election in the list
   for(var i = 0; i < electionList.length; i++) {
 
-    // If this election is one relevant to the user
+    // If this election is one relevant to the user (based on their address)
     if(isApplicable($("#state").val(), electionList[i].ocdDivisionId)) {
       // Display the election info
       var thisElection = $("<div>", {
@@ -119,7 +92,7 @@ $("#getCandidates").on("click", function() {
 
       $("#dataWrapper").append(thisElection);
 
-      // Get the info for that election
+      // Get detiled info for that election (polling location, contests, candidates)
       $.ajax({
         url: voterInfoURL + "&address=" + address + "&electionId=" + electionList[i].id,
         method: "GET"
@@ -127,38 +100,42 @@ $("#getCandidates").on("click", function() {
 
         // Show their polling location info under the election name
         var polls = response.pollingLocations;
-        for(var i = 0; i < polls.length; i++) {
 
-          // If there is an address, display it
-          if(polls[i].address.line1 != "") {
-            var pollingLocation = $("<div>", {
-                                    "class" : "poll"
-                                   });
-            var locationLbl = $("<span>", {
+        if(!!polls) {
+          for(var i = 0; i < polls.length; i++) {
+
+            // If there is an address, display it
+            if(polls[i].address.line1 != "") {
+              var pollingLocation = $("<div>", {
+                                      "class" : "poll"
+                                     });
+              var locationLbl = $("<span>", {
+                                  "class" : "lbl",
+                                  "text" : "Polling location: "
+                                  });
+              var locationTxt = polls[i].address.line1 + ", " +
+                                polls[i].address.city + ", " + polls[i].address.state +
+                                " " + polls[i].address.zip;
+
+              pollingLocation.append(locationLbl);
+              pollingLocation.append(locationTxt);
+
+              // If the hours are known, display them also
+              if(polls[i].pollingHours != "") {
+                var hoursLbl = $("<span>", {
                                 "class" : "lbl",
-                                "text" : "Polling location: "
+                                "text" : "Hours: "
                                 });
-            var locationTxt = polls[i].address.line1 + ", " +
-                              polls[i].address.city + ", " + polls[i].address.state +
-                              " " + polls[i].address.zip;
+                pollingLocation.append(" | ");
+                pollingLocation.append(hoursLbl);
+                pollingLocation.append(polls[i].pollingHours);
+              }
 
-            pollingLocation.append(locationLbl);
-            pollingLocation.append(locationTxt);
-
-            // If the hours are known, display them also
-            if(polls[i].pollingHours != "") {
-              var hoursLbl = $("<span>", {
-                              "class" : "lbl",
-                              "text" : "Hours: "
-                              });
-              pollingLocation.append(" | ");
-              pollingLocation.append(hoursLbl);
-              pollingLocation.append(polls[i].pollingHours);
+              $("#dataWrapper").append(pollingLocation);
             }
-
-            $("#dataWrapper").append(pollingLocation);
           }
         }
+
 
         var contests = response.contests;
         console.log(contests);
@@ -204,19 +181,26 @@ $("#getCandidates").on("click", function() {
               candInfo.append(cParty);
 
               // Display link to their website
+              var cURL = $("<span>"); // Candidate URL span
               if(!!candURL) {
-                // Put it somewhere
-
-
-
+                cURL.attr("class", "candURL");
+                // Need to make the link
+                var cLink = $("<a>", {
+                  "href" : candURL,
+                  "text" : formatURL(candURL),
+                  "target" : "_blank"
+                });
               }
+              else {
+                cURL.attr("class", "spacer");   // if no url, make a placeholder for spacing
+              }
+              candInfo.append(cURL);
 
               // Display links to their social media channels
               if(!!socialMedia) {
-                console.log("smoooooooo");
-                console.log(socialMedia);
+
                 var cSocial = $("<span>", { // Social media span
-                "class" : "candSocial",
+                "class" : "candSocial"
                 });
 
                 for(var k = 0; k < socialMedia.length; k++) {
@@ -250,7 +234,7 @@ $("#getCandidates").on("click", function() {
               }
 
 
-
+              // LINK BROKEN-- NEED TO LOOK AT
 
 
 /*
@@ -266,16 +250,31 @@ $.ajax({
   console.log(electionList);
   });*/
 
+              // Get the OpenSecrets ID
+              var CID;
+              var CID = getCID(candName, candParty);
+              // var tempState = electionList[i].ocdDivisionId.split("/");
+
+              // // If this is a state or local election, pass over the name of the state
+              // // in case of a name conflict.
+              // if(tempState[2]) {
+              //   CID = getCID(candName, candParty, tempState[2].substr(-2, 2));
+              // }
+              // else { // Otherwise just the name and party
+              //   CID = getCID(candName, candParty);
+              // }
+
+
+  // If there's a / or & in the name, it's two names (several states have "Governor & Lt. Gvn'r" on the
+  // same ticket).  In these cases we're going to have to find two different CIDs (CID and CID2).
+
+
+
 
               $(dataWrapper).append(candInfo);
             }
           }
-
         }
-        // // Display the data
-        // $("#dataWrapper").css("display", "block");
-        // // Let users pick a different address
-        // $("#restart").css("display", "block");
       });
     }
   }
@@ -313,7 +312,7 @@ function isApplicable(state, divisionString) {
   console.log(divisionString);
   var divisions = divisionString.split("/");
   // False if the election is not in the US
-  if(divisions[1].substr(-2,2) != "us") {
+  if(divisions[1].substr(-2, 2) != "us") {
     return false;
   }
   // False if the state for this election isn't equal to the user's state
@@ -337,4 +336,60 @@ function parseAddress() {
   // If any of the required data is missing, just means we can't refine the search
 
   return address + ", " + city + ", " + state;
+}
+
+// Returns pretty-print URL
+function formatURL(url) {
+  var tempURL = url.replace("http://www.", "");
+  if(tempURL.substr(-1, 1) === '/') {
+    tempURL = tempURL.substr(1, tempURL.length - 1);
+  }
+  return tempURL;
+}
+
+// Returns the candidate's CID if found in the list
+// If not found, returns 0.
+// Party and state are passed as tiebreakers in case there are two candidates with the same name.
+// Note: State is irrelevant for federal elections, but may weight it in favor of one candidate or the other.
+// If we can't determine which candidate, return 0 because it's better not to display anything than to display incorrect data!
+function getCID(name, party, state) {
+
+  // If there's a / or & in the name, it's two names (several states have "Governor & Lt. Gvn'r" on the
+  // same ticket).  In these cases let's just return the CID for the first person (for now).  This should
+  // be dealt with before making this function call though.
+
+  var nameArray = name.split(" ");
+  var suffixes = ["Jr.", "Sr.", "II", "III"];
+  var z;
+
+  // If this person has a suffix, we want the name part before the suffix
+  if(suffixes.indexOf(nameArray[nameArray.length - 1]) != -1) {
+    z = nameArray.length - 2;
+  }
+  else {
+    z = nameArray.length - 1;
+  }
+  // nameFormatted = Lastname, Firstname
+  var nameFormatted = nameArray[z] + ", " + nameArray[0];
+
+  for(var i = 1; i < CRPIDs.length; i++) {
+    // Format the name from the spreadsheet
+    var xlsNameArray = CRPIDs[i].CRPName.split(" ");
+    var xlsName = xlsNameArray[0] + " " + xlsNameArray[1];
+
+    if(nameFormatted == xlsName) {
+      // We really should check the next name to see if it matches too, but let's get this working
+      // so assume we found the right one first try (for now).  This should be a recursive function anyway.
+      console.log(xlxName + " " + CRPIDs[i].CID);
+      return CRPIDs[i].CID;
+    }
+  }
+
+  return 0;
+
+// $("#state").val()
+
+  // Try a binary search to get the name faster
+    // Get first, middle, last values
+    // Make a recursive function to do it
 }
