@@ -10,9 +10,10 @@ var candidateList = [];
 
 var CRPIDs = [];
 
+var corsURL = "https://cors-anywhere.herokuapp.com/"
 var secretsURL = "https://www.opensecrets.org/api/";
 var secretsKey = "0c3901123cb9b3216d43c9c18bf2e693";
-var candContribURL = secretsURL + "?method=candContrib&apikey=" + secretsKey + "&output=json"
+var candContribURL = corsURL + secretsURL + "?method=candContrib&apikey=" + secretsKey + "&output=json"
 
 // Get list of upcoming elections
 // Called before user has a chance to provide any input so it should be ready
@@ -265,10 +266,17 @@ $("#getCandidates").on("click", function(event) {
                 url: candContribURL + "&cid=" + CID,
                 method: "GET"
                 }).done(function(response) {
-                  console.log("AAAAA");
-                  console.log(response);
 
+                  console.log(JSON.parse(response));
 
+                  var contributors = JSON.parse(response).response.contributors;
+                  for(var k = 0; k < contributors.length; k++) {
+                    // contributors[k].org_name
+                    // contributors[k].total
+                    // contributors[k].pacs
+                    // contributors[k].indivs
+                    console.log(contributors[k].org_name);
+                  }
 
 
 

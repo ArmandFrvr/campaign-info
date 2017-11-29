@@ -159,7 +159,6 @@ label[for=state] {
   display: inline-block;
   margin: 0px 10px;
   width: 200px;
-
 }
 
 .candParty {
@@ -171,7 +170,6 @@ label[for=state] {
 .candSocial {
   display: inline-block;
   width: 200px;
-
 }
 
 .candURL {
@@ -203,4 +201,12 @@ label[for=state] {
   width: 1px;
   height: 1px;
   overflow: hidden;
+}
+
+.contributors {
+
+}
+
+.contributor {
+
 }
