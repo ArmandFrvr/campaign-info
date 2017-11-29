@@ -23,6 +23,10 @@ h3 {
   font-size: 1.5em;
 }
 
+a {
+  text-decoration: underline;
+}
+
 /* Styles for user information modal */
 .usrInfo {
   margin: 0px 20px;
@@ -172,12 +176,12 @@ label[for=state] {
 
 .candURL {
   display: inline-block;
-  width: 200px;
+  width: 250px;
 }
 
 .spacer { /* Must be same width as candURL */
   display: inline-block;
-  width: 200px;
+  width: 250px;
 }
 
 @media (max-width: 500px) {  /* Or whatever our mobile width is */

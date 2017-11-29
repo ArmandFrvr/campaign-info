@@ -190,6 +190,7 @@ $("#getCandidates").on("click", function(event) {
                   "text" : formatURL(candURL),
                   "target" : "_blank"
                 });
+                cURL.append(cLink);
               }
               else {
                 cURL.attr("class", "spacer");   // if no url, make a placeholder for spacing
@@ -207,16 +208,20 @@ $("#getCandidates").on("click", function(event) {
                   var smIcon = (function (smType) {
                                   switch(smType) {
                                     case "Twitter":
-                                      return $('<i class="fa fa-twitter"><span class="accessible">'
-                                       + candName + '\'s Twitter</span></i>');
+                                      return $('<i class="fa fa-twitter" title="' + candName
+                                        + '\'s Twitter"><span class="accessible">'
+                                        + candName + '\'s Twitter</span></i>');
                                     case "YouTube":
-                                      return $('<i class="fa fa-youtube"><span class="accessible">'
+                                      return $('<i class="fa fa-youtube" title="' + candName
+                                        + '\'s YouTube"><span class="accessible">'
                                        + candName + '\'s YouTube</span></i>');
                                     case "Facebook":
-                                      return $('<i class="fa fa-facebook"><span class="accessible">'
+                                      return $('<i class="fa fa-facebook" title="' + candName
+                                        + '\'s Facebook"><span class="accessible">'
                                        + candName + '\'s Facebook</span></i>');
                                     case "GooglePlus":
-                                      return $('<i class="fa fa-google-plus"><span class="accessible">'
+                                      return $('<i class="fa fa-google-plus" title="' + candName
+                                        + '\'s Google Plus"><span class="accessible">'
                                        + candName + '\'s Google Plus</span></i>');
                                     default:
                                       return "";
@@ -335,9 +340,13 @@ function parseAddress() {
 
 // Returns pretty-print URL
 function formatURL(url) {
-  var tempURL = url.replace("http://www.", "");
+  console.log("URL: " + url);
+  var tempURL = url.replace("http://", "").replace("www.", "").replace(/[^/]+$/, "");
+  console.log("tempURL: " + tempURL);
   if(tempURL.substr(-1, 1) === '/') {
-    tempURL = tempURL.substr(1, tempURL.length - 1);
+
+    tempURL = tempURL.substr(0, tempURL.length - 1);
+    console.log("tempAftr: " + tempURL);
   }
   return tempURL;
 }
@@ -375,7 +384,7 @@ function getCID(name, party, state) {
     if(nameFormatted == xlsName) {
       // We really should check the next name to see if it matches too, but let's get this working
       // so assume we found the right one first try (for now).  This should be a recursive function anyway.
-      console.log(xlxName + " " + CRPIDs[i].CID);
+      console.log(xlsName + " " + CRPIDs[i].CID);
       return CRPIDs[i].CID;
     }
   }
