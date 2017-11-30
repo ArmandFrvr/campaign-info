@@ -1,17 +1,28 @@
+html {
+  height: 100%;
+}
+
 body {
   font-family: 'Karla', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
   background-color: #F9F9F9;
+  background-image: url("../images/flag.png");
+  background-size: 100%;
+  background-repeat: no-repeat;
+  box-shadow: inset 2px 3px 7px blue, inset -2px -3px 7px red;
+  padding-bottom: 20px;
+  min-height: 100%;
 }
 
 h1, h2, h3 {
-  font-family: 'Raleway', 'Georgia', Times, Times New Roman, serif;
+  font-family: 'Montserrat', sans-serif;
 }
 
 h1 {
   text-align: center;
-  padding: 18px;
-  font-size: 2em;
+  padding: 30px;
+  font-size: 3em;
   font-weight: bold;
+  text-shadow: 0 0 3px #6cf;
 }
 
 h2 {
@@ -39,8 +50,9 @@ a {
   max-width: 600px;
   margin: 0 auto;
   background-color: #cccccc;
-  border: 1px solid gray;
+  border: 4px solid gray;
   border-radius: 20px;
+  box-shadow: 2px 3px 7px blue, -2px -3px 7px red;
 }
 
 label[for=name] {
@@ -93,15 +105,20 @@ label[for=state] {
   border: 1px solid gray;
   border-radius: 20px;
   display: none;  /* Don't display until after there's data */
+  box-shadow: 2px 0px 7px blue, -2px 0px 7px red;
 }
 
 #addressInfo {
   display: none;
   padding: 10px 20px;
+  background-color: #CCCCCC;
+  width: 90%;
+  box-shadow: 2px 0px 7px blue, -2px 0px 7px red;
+  margin: 0 auto;
 }
 
 #changeAddr {
-  background-color: #F9F9F9;
+  background-color: #CCCCCC;
   border: none;
   color: blue;
   text-decoration: underline;
@@ -164,6 +181,10 @@ label[for=state] {
   background-color: #f2f2f2;
 }
 
+.candidate:nth-of-type(even) {
+  background-color: #F9F9F9;
+}
+
 .candName {
   font-weight: bold;
   font-size: 1.25em;
@@ -177,6 +198,7 @@ label[for=state] {
   display: inline-block;
   margin: 0px 10px;
   width: calc(25% - 20px);
+  word-wrap: break-word;
 }
 
 .smLink {
@@ -233,8 +255,9 @@ label[for=state] {
 
   #dataWrapper {
     padding: 0px;
-    width: 100%;
+    width: 95%;
     border: none;
+    border-radius: 0px;
   }
 
   .election {
@@ -261,6 +284,10 @@ label[for=state] {
     padding: 5px;
   }
 
+  #addressInfo {
+    width: 95%;
+  }
+
   #myAddress {
     width: 100%;
     display: inline-block;
@@ -278,5 +305,12 @@ label[for=state] {
   .contribOrg {
     text-align: left;
     padding-left: 0px;
+  }
+
+  body {
+    background-image: url("../images/stars.jpg");
+    background-size: 100%;
+    background-repeat: repeat;
+    padding-bottom: 10px;
   }
 }
