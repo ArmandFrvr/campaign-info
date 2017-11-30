@@ -6,24 +6,24 @@ var electionURL = civicURL + "elections?key=" + civicKey;
 var voterInfoURL = civicURL + "voterinfo?key=" + civicKey;
 
 var electionList = [];
-var candidateList = [];
-
 var CRPIDs = [];
 
-var corsURL = "https://cors-anywhere.herokuapp.com/"
+var corsURL = "https://cors-anywhere.herokuapp.com/";
 var secretsURL = "https://www.opensecrets.org/api/";
 var secretsKey = "0c3901123cb9b3216d43c9c18bf2e693";
-var candContribURL = corsURL + secretsURL + "?method=candContrib&apikey=" + secretsKey + "&output=json"
+// Backup key (200/day limit)
+// var secretsKey = "8dacce829b4fc0b4b9a29b711149324c";
+var candContribURL = corsURL + secretsURL + "?method=candContrib&output=json&apikey=" + secretsKey;
 
 // Get list of upcoming elections
 // Called before user has a chance to provide any input so it should be ready
 $.ajax({
   url: electionURL,
   method: "GET"
-  }).done(function(response) {
+}).done(function(response) {
   electionList = response.elections;
   console.log(electionList);
-  });
+});
 
 // Load candidate ID list from XLS file (needed for OpenSecrets calls)
 alasql.promise('SELECT [B] as CID, [C] as CRPName, [D] as party, [E] as distID, [F] as FECID ' +
@@ -35,14 +35,6 @@ alasql.promise('SELECT [B] as CID, [C] as CRPName, [D] as party, [E] as distID, 
         }).catch(function(err) {
           console.log("Error: ", err);
         });
-
-$(document).ready(function() {
-
-
-
-
-});
-
 
 $("#getCandidates").on("click", function(event) {
 
@@ -232,15 +224,7 @@ $("#getCandidates").on("click", function(event) {
                 candInfo.append(cSocial);
               }
 
-
-
-
               // Here's where we make the ajax call to OpenSecrets to look for their info
-              //
-              //
-              //
-              //
-              //
 
               // Get the OpenSecrets ID
               // Simple call without checking for combined names or states or anything
@@ -259,31 +243,81 @@ $("#getCandidates").on("click", function(event) {
               // If there's a / or & in the name, it's two names (several states have "Governor & Lt. Gvn'r" on the
               // same ticket).  In these cases we're going to have to find two different CIDs (CID and CID2).
 
-              // Make API call to OpenSecrets
+              // If we have a valid CID, make the API call to OpenSecrets
+              if(CID !== 0) {
 
-
-              $.ajax({
-                url: candContribURL + "&cid=" + CID,
-                method: "GET"
+                $.ajax({
+                  url: candContribURL + "&cid=" + CID,
+                  method: "GET",
+                  async: false
                 }).done(function(response) {
 
-                  console.log(JSON.parse(response));
+                  // Whoever designed this API is an idiot
+                  var contributors = JSON.parse(response).response.contributors.contributor;
 
-                  var contributors = JSON.parse(response).response.contributors;
-                  for(var k = 0; k < contributors.length; k++) {
-                    // contributors[k].org_name
-                    // contributors[k].total
-                    // contributors[k].pacs
-                    // contributors[k].indivs
-                    console.log(contributors[k].org_name);
+                  var financeData = $("<div>", {"class" : "contributors"});
+
+                  // If we have some contributors, insert a header row
+                  if(contributors.length > 0) {
+
+                    var headerRow = $("<div>", {"class" : "contribHeader"});
+
+                    var orgHeader = $("<span>", {
+                                      "class" : "contribOrg lbl",
+                                      "text" : "Organization"
+                                    });
+                    var totalHeader = $("<span>", {
+                                        "class" : "contribTotal lbl",
+                                        "text" : "Total Contributions"
+                                      });
+                    var pacsHeader = $("<span>", {
+                                        "class" : "contribPACS lbl",
+                                        "text" : "From PACs"
+                                      });
+                    var indivsHeader = $("<span>", {
+                                        "class" : "contribIndivs lbl",
+                                        "text" : "From Individuals"
+                                      });
+
+                    headerRow.append(orgHeader).append(totalHeader).append(pacsHeader).append(indivsHeader);
+                    financeData.append(headerRow);
                   }
 
+                  // Loop through the contributors and append them to the finance info div
+                  for(var k = 0; k < contributors.length; k++) {
 
+                    // Making variables because this JSON structure makes me want to stab myself in the eye
+                    var org = contributors[k]["@attributes"].org_name;
+                    var total = contributors[k]["@attributes"].total;
+                    var pacs = contributors[k]["@attributes"].pacs;
+                    var indivs = contributors[k]["@attributes"].indivs;
 
+                    var contributor = $("<div>", {"class" : "contributor"});
 
+                    var orgSpan = $("<span>", {
+                                      "class" : "contribOrg",
+                                      "text" : org
+                                  });
+                    var totalSpan = $("<span>", {
+                                      "class" : "contribTotal",
+                                      "text" : "$" + total
+                                    });
+                    var pacsSpan = $("<span>", {
+                                      "class" : "contribPACS",
+                                      "text" : "$" + pacs
+                                    });
+                    var indivsSpan = $("<span>", {
+                                      "class" : "contribIndivs",
+                                      "text" : "$" + indivs
+                                    });
+
+                    contributor.append(orgSpan).append(totalSpan).append(pacsSpan).append(indivsSpan);
+                    financeData.append(contributor);
+                  }
+
+                  candInfo.append(financeData);
                 });
-
-
+              }
 
               $(dataWrapper).append(candInfo);
             }
@@ -292,12 +326,6 @@ $("#getCandidates").on("click", function(event) {
       });
     }
   }
-
-
-
-
-
-
 });
 
 

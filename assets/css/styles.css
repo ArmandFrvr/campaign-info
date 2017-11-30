@@ -148,7 +148,7 @@ label[for=state] {
 }
 
 .candidate {
-  padding-left: 30px;
+  padding: 10px 0px 10px 30px;
 }
 
 .candidate:nth-of-type(odd) {
@@ -159,6 +159,8 @@ label[for=state] {
   display: inline-block;
   margin: 0px 10px;
   width: 200px;
+  font-weight: bold;
+  font-size: 1.25em;
 }
 
 .candParty {
@@ -182,12 +184,6 @@ label[for=state] {
   width: 250px;
 }
 
-@media (max-width: 500px) {  /* Or whatever our mobile width is */
-  .spacer {
-    display: none;  /* Don't display width spacers on mobile */
-  }
-}
-
 .smLink {
   padding: 10px;
 }
@@ -204,9 +200,48 @@ label[for=state] {
 }
 
 .contributors {
-
+  padding: 10px 0px 10px 40px;
 }
 
 .contributor {
 
+}
+
+.contribHeader span {
+  padding-bottom: 5px;
+}
+
+.contribOrg {
+  display: inline-block;
+  padding: 0px 10px;
+  width: 30%;
+
+}
+
+.contribTotal, .contribPACS, .contribIndivs {
+  display: inline-block;
+  padding: 0px 10px;
+  width: 20%;
+  text-align: right;
+}
+
+@media (max-width: 500px) {  /* Or whatever our mobile width is */
+  .spacer {
+    display: none;  /* Don't display width spacers on mobile */
+  }
+
+  .candiadate,
+  .office {
+    padding-left: 10px;
+  }
+
+  .contributors {
+    padding-left: 0px;
+  }
+
+  .candParty, .candURL,
+  .candSocial, .candName {
+    display: inline-block;
+    width: 100%;
+  }
 }
