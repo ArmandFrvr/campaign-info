@@ -232,7 +232,7 @@ label[for=state] {
   display: inline-block;
   padding: 0px 10px;
   width: calc(40% - 40px);
-
+  word-wrap: break-word;
 }
 
 .contribTotal, .contribPACS, .contribIndivs {
