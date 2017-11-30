@@ -1,5 +1,6 @@
 body {
   font-family: 'Karla', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+  background-color: #F9F9F9;
 }
 
 h1, h2, h3 {
@@ -34,6 +35,8 @@ a {
 
 #getUsrInfo {
   width: 50%;
+  min-width: 375px;
+  max-width: 600px;
   margin: 0 auto;
   background-color: #cccccc;
   border: 1px solid gray;
@@ -98,7 +101,7 @@ label[for=state] {
 }
 
 #changeAddr {
-  background-color: white;
+  background-color: #F9F9F9;
   border: none;
   color: blue;
   text-decoration: underline;
@@ -137,9 +140,9 @@ label[for=state] {
 }
 
 .office {
-  /*background-color: #ccff99;*/
   padding: 5px 5px 5px 20px;
   font-weight: bold;
+  background-color: #D0D0F2;
 }
 
 .officeWrapper {
@@ -155,33 +158,19 @@ label[for=state] {
   background-color: #f2f2f2;
 }
 
-.candName{
-  display: inline-block;
-  margin: 0px 10px;
-  width: 200px;
+.candName {
   font-weight: bold;
   font-size: 1.25em;
 }
 
-.candParty {
-  display: inline-block;
-  margin: 0px 10px;
-  width: 200px;
-}
-
-.candSocial {
-  display: inline-block;
-  width: 200px;
-}
-
-.candURL {
-  display: inline-block;
-  width: 250px;
-}
-
+.candName,
+.candParty,
+.candSocial,
+.candURL,
 .spacer { /* Must be same width as candURL */
   display: inline-block;
-  width: 250px;
+  margin: 0px 10px;
+  width: calc(25% - 20px);
 }
 
 .smLink {
@@ -214,7 +203,7 @@ label[for=state] {
 .contribOrg {
   display: inline-block;
   padding: 0px 10px;
-  width: 30%;
+  width: calc(40% - 40px);
 
 }
 
@@ -225,14 +214,34 @@ label[for=state] {
   text-align: right;
 }
 
-@media (max-width: 500px) {  /* Or whatever our mobile width is */
+@media (max-width: 850px) {  /* Or whatever our too-small width is */
+  #getUsrInfo {
+    width: 95%;
+    min-width: 275px;
+    border-radius: 5px;
+  }
+
   .spacer {
     display: none;  /* Don't display width spacers on mobile */
   }
 
-  .candiadate,
+  #dataWrapper {
+    padding: 0px;
+    width: 100%;
+    border: none;
+  }
+
+  .election {
+    text-align: center;
+  }
+
+  .candidate,
   .office {
     padding-left: 10px;
+  }
+
+  .candidate {
+    text-align: center;
   }
 
   .contributors {
@@ -243,5 +252,25 @@ label[for=state] {
   .candSocial, .candName {
     display: inline-block;
     width: 100%;
+    padding: 5px;
+  }
+
+  #myAddress {
+    width: 100%;
+    display: inline-block;
+  }
+
+  #changeAddr {
+    padding: 0px;
+  }
+
+  .election:nth-of-type(1) {
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+  }
+
+  .contribOrg {
+    text-align: left;
+    padding-left: 0px;
   }
 }
