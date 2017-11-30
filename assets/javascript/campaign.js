@@ -85,6 +85,15 @@ $("#getCandidates").on("click", function(event) {
         async: false
       }).done(function(response) {
 
+        var contests = response.contests;
+
+        // If we don't have contests for some reason, don't do anything else here
+        if(!contests) {
+          return;
+        }
+
+        console.log(contests);
+
         // Show their polling location info under the election name
         var polls = response.pollingLocations;
 
@@ -123,10 +132,6 @@ $("#getCandidates").on("click", function(event) {
           }
         }
 
-
-        var contests = response.contests;
-        console.log(contests);
-
         // For each contest in this election
         for(var i = 0; i < contests.length; i++) {
 
@@ -144,7 +149,6 @@ $("#getCandidates").on("click", function(event) {
             $("#dataWrapper").append(office);
 
             var candidates = contests[i].candidates;
-            console.log(candidates);
 
             // For each candidate running for office
             for(var j = 0; candidates && j < candidates.length; j++) {
@@ -351,7 +355,6 @@ $("#changeAddr").on("click", function() {
 // test local elections with.
 // divisionString is of the format "ocd-division/country:us/state:ca"
 function isApplicable(state, divisionString) {
-  console.log(state);
   console.log(divisionString);
   var divisions = divisionString.split("/");
   // False if the election is not in the US
