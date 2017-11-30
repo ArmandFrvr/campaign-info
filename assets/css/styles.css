@@ -1,5 +1,9 @@
 body {
+  font-family: 'Karla', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+}
 
+h1, h2, h3 {
+  font-family: 'Raleway', 'Georgia', Times, Times New Roman, serif;
 }
 
 h1 {
@@ -17,6 +21,10 @@ h2 {
 h3 {
   font-weight: bold;
   font-size: 1.5em;
+}
+
+a {
+  text-decoration: underline;
 }
 
 /* Styles for user information modal */
@@ -151,7 +159,6 @@ label[for=state] {
   display: inline-block;
   margin: 0px 10px;
   width: 200px;
-
 }
 
 .candParty {
@@ -163,7 +170,22 @@ label[for=state] {
 .candSocial {
   display: inline-block;
   width: 200px;
+}
 
+.candURL {
+  display: inline-block;
+  width: 250px;
+}
+
+.spacer { /* Must be same width as candURL */
+  display: inline-block;
+  width: 250px;
+}
+
+@media (max-width: 500px) {  /* Or whatever our mobile width is */
+  .spacer {
+    display: none;  /* Don't display width spacers on mobile */
+  }
 }
 
 .smLink {
@@ -179,4 +201,12 @@ label[for=state] {
   width: 1px;
   height: 1px;
   overflow: hidden;
+}
+
+.contributors {
+
+}
+
+.contributor {
+
 }
