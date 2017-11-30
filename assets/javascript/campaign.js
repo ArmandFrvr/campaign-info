@@ -89,6 +89,11 @@ $("#getCandidates").on("click", function(event) {
 
         // If we don't have contests for some reason, don't do anything else here
         if(!contests) {
+          var errMsg = $("<div>", {
+                          "class" : "lbl candidate",
+                          "text" : "No information found for this election."
+                        });
+          $("#dataWrapper").append(errMsg);
           return;
         }
 
@@ -324,7 +329,7 @@ $("#getCandidates").on("click", function(event) {
                 });
               }
 
-              $(dataWrapper).append(candInfo);
+              $("#dataWrapper").append(candInfo);
             }
           }
         }
