@@ -12,7 +12,7 @@ var CRPIDs = [];
 
 var corsURL = "https://cors-anywhere.herokuapp.com/"
 var secretsURL = "https://www.opensecrets.org/api/";
-var secretsKey = "0c3901123cb9b3216d43c9c18bf2e693";
+var secretsKey = "8dacce829b4fc0b4b9a29b711149324c";
 var candContribURL = corsURL + secretsURL + "?method=candContrib&apikey=" + secretsKey + "&output=json"
 
 // Get list of upcoming elections
@@ -235,22 +235,12 @@ $("#getCandidates").on("click", function(event) {
 
 
 
-<<<<<<< HEAD
-
-/*
-=======
->>>>>>> 26cd9b644fe079afd9dd37136c32d08d00eb279a
               // Here's where we make the ajax call to OpenSecrets to look for their info
-var oSapiKey = "8dacce829b4fc0b4b9a29b711149324c"
-var oURL = "https://www.opensecrets.org/api/?method=candContrib&cid=H4LA05221&cycle=2016&apikey="
-var oSapiURL = oURL + oSapiKey
-$.ajax({
-  url: oSapiURL,
-  method: "GET"
-  }).done(function(response) {
-  electionList = response.elections;
-  console.log(electionList);
-  });*/
+              //
+              //
+              //
+              //
+              //
 
               // Get the OpenSecrets ID
               // Simple call without checking for combined names or states or anything
