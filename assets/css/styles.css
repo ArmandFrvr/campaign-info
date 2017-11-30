@@ -127,10 +127,9 @@ label[for=state] {
 }
 
 .election {
-  font-weight: bold;
   background-color: #CCCCCC;
-  color: #0C35CA;
-  padding: 10px;
+  /*color: #0C35CA;*/
+  /*padding: 10px;*/
   border-top-right-radius: 20px;
   border-top-left-radius: 20px;
 }
@@ -145,12 +144,16 @@ label[for=state] {
 }
 
 .electionName {
-
+  padding: 10px 10px 0px 10px;
+  color: #0C35CA;
 }
 
 .electionDate {
   font-size: 1.25em;
-  padding-top: 5px;
+  padding: 0px 10px 10px 10px;
+  color: #0C35CA;
+  display: inline-block;
+  font-weight: bold;
 }
 
 .poll {
