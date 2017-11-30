@@ -81,7 +81,8 @@ $("#getCandidates").on("click", function(event) {
       // Get detiled info for that election (polling location, contests, candidates)
       $.ajax({
         url: voterInfoURL + "&address=" + address + "&electionId=" + electionList[i].id,
-        method: "GET"
+        method: "GET",
+        async: false
       }).done(function(response) {
 
         // Show their polling location info under the election name
