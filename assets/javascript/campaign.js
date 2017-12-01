@@ -257,13 +257,22 @@ $("#getCandidates").on("click", function(event) {
               // If there's a / or & in the name, it's two names (several states have "Governor & Lt. Gvn'r" on the
               // same ticket).  In these cases we're going to have to find two different CIDs (CID and CID2).
 
+              // No CID, so just add the candidate info that we have
+              if(CID === 0) {
+                $(electionDivId).append(candInfo);
+              }
               // If we have a valid CID, make the API call to OpenSecrets
-              if(CID !== 0) {
+              else {
+                // Give the new candInfo div an ID based on the CID so we can
+                // add to it when the ajax call returns, then add it to the DOM.
+                candInfo.attr("id", "cand-" + CID);
+                $(electionDivId).append(candInfo);
 
+                // Make the OpenSecrets call
                 $.ajax({
                   url: candContribURL + "&cid=" + CID,
                   method: "GET",
-                  async: false
+                  cID: CID
                 }).done(function(response) {
 
                   // Whoever designed this API is an idiot
@@ -329,11 +338,10 @@ $("#getCandidates").on("click", function(event) {
                     financeData.append(contributor);
                   }
 
-                  candInfo.append(financeData);
+                  var thisCand = "#cand-" + this.cID;
+                  $(thisCand).append(financeData);
                 });
               }
-
-              $(electionDivId).append(candInfo);
             }
           }
         }
@@ -364,7 +372,6 @@ $("#changeAddr").on("click", function() {
 // test local elections with.
 // divisionString is of the format "ocd-division/country:us/state:ca"
 function isApplicable(state, divisionString) {
-  console.log(divisionString);
   var divisions = divisionString.split("/");
   // False if the election is not in the US
   if(divisions[1].substr(-2, 2) != "us") {
@@ -377,6 +384,7 @@ function isApplicable(state, divisionString) {
   // When we have better data, add more conditions to check for more local divisions like
   // cities, school districts, etc.  Don't know what they're called since there isn't any
   // data in the test DB for these.
+  console.log(divisionString);
   return true;
 }
 
