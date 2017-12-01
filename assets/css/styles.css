@@ -1,8 +1,8 @@
 body {
   font-family: 'Karla', 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
-  background-image: url("C:/Users/Pedro/code/campaign-info/assets/images/flag.jpg");
+  background-image: url("../images/flag.png");
   background-size: cover;
-  background-color: black;
+  background-color: #999;
 }
 
 h1, h2, h3 {

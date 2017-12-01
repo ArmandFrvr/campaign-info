@@ -6,20 +6,24 @@ var electionURL = civicURL + "elections?key=" + civicKey;
 var voterInfoURL = civicURL + "voterinfo?key=" + civicKey;
 
 var electionList = [];
-var candidateList = [];
-
 var CRPIDs = [];
 
+var corsURL = "https://cors-anywhere.herokuapp.com/";
+var secretsURL = "https://www.opensecrets.org/api/";
+var secretsKey = "0c3901123cb9b3216d43c9c18bf2e693";
+// Backup key (200/day limit)
+// var secretsKey = "8dacce829b4fc0b4b9a29b711149324c";
+var candContribURL = corsURL + secretsURL + "?method=candContrib&output=json&apikey=" + secretsKey;
 
 // Get list of upcoming elections
 // Called before user has a chance to provide any input so it should be ready
 $.ajax({
   url: electionURL,
   method: "GET"
-  }).done(function(response) {
+}).done(function(response) {
   electionList = response.elections;
   console.log(electionList);
-  });
+});
 
 // Load candidate ID list from XLS file (needed for OpenSecrets calls)
 alasql.promise('SELECT [B] as CID, [C] as CRPName, [D] as party, [E] as distID, [F] as FECID ' +
@@ -32,27 +36,9 @@ alasql.promise('SELECT [B] as CID, [C] as CRPName, [D] as party, [E] as distID, 
           console.log("Error: ", err);
         });
 
-// https://www.opensecrets.org/api/?method=getOrgs&org=Clinton&apikey=0c3901123cb9b3216d43c9c18bf2e693
-
-
-$(document).ready(function() {
-
-
-
-
-});
-
-
-
 $("#getCandidates").on("click", function(event) {
 
   event.preventDefault();
-
-  // https://www.googleapis.com/civicinfo/v2/elections?key=AIzaSyAVPZRcm8AoSUyWjp_mguSDes1qudW_JpE
-  // https://www.googleapis.com/civicinfo/v2/voterinfo?key=AIzaSyAVPZRcm8AoSUyWjp_mguSDes1qudW_JpE&address=14442%20Grassmere%20Ln%2C%20Tustin%20CA&electionId=2000
-  // var secretsURL = "";
-  // var secretsKey = "0c3901123cb9b3216d43c9c18bf2e693"
-  // var address = parseAddress();
 
   // Hide modal
   $("#getUsrInfo").css("display", "none");
@@ -70,33 +56,52 @@ $("#getCandidates").on("click", function(event) {
   address = encodeURIComponent(address);
 
   // For each election in the list
-  for(var i = 0; i < electionList.length; i++) {
+  for(var h = 0; h < electionList.length; h++) {
+
+    var electionDivId = "election-" + electionList[h].id;
 
     // If this election is one relevant to the user (based on their address)
-    if(isApplicable($("#state").val(), electionList[i].ocdDivisionId)) {
+    if(isApplicable($("#state").val(), electionList[h].ocdDivisionId)) {
       // Display the election info
       var thisElection = $("<div>", {
                             "class" : "election",
-                            "id" : electionList[i].id
+                            "id" : electionDivId
                           });
       var electionName = $("<h2>", {
                             "class" : "electionName",
-                            "text" : electionList[i].name
+                            "text" : electionList[h].name
                           });
       var electionDate = $("<span>", {
                             "class" : "electionDate",
-                            "text" : electionList[i].electionDay
+                            "text" : electionList[h].electionDay
                           });
       thisElection.append(electionName);
       thisElection.append(electionDate);
 
       $("#dataWrapper").append(thisElection);
 
-      // Get detiled info for that election (polling location, contests, candidates)
+      // Get detailed info for that election (polling location, contests, candidates)
       $.ajax({
-        url: voterInfoURL + "&address=" + address + "&electionId=" + electionList[i].id,
-        method: "GET"
+        url: voterInfoURL + "&address=" + address + "&electionId=" + electionList[h].id,
+        method: "GET",
+        eID: electionDivId  // passing in the div's ID so we can add stuff to it asynchronously
       }).done(function(response) {
+
+        var electionDivId = "#" + this.eID;
+
+        var contests = response.contests;
+
+        // If we don't have contests for some reason, don't do anything else here
+        if(!contests) {
+          var errMsg = $("<div>", {
+                          "class" : "lbl candidate",
+                          "text" : "No information found for this election."
+                        });
+          $(electionDivId).append(errMsg);
+          return;
+        }
+
+        console.log(contests);
 
         // Show their polling location info under the election name
         var polls = response.pollingLocations;
@@ -131,14 +136,10 @@ $("#getCandidates").on("click", function(event) {
                 pollingLocation.append(polls[i].pollingHours);
               }
 
-              $("#dataWrapper").append(pollingLocation);
+              $(electionDivId).append(pollingLocation);
             }
           }
         }
-
-
-        var contests = response.contests;
-        console.log(contests);
 
         // For each contest in this election
         for(var i = 0; i < contests.length; i++) {
@@ -154,10 +155,9 @@ $("#getCandidates").on("click", function(event) {
                             "class" : "office",
                             "text" : contests[i].office
                           });
-            $("#dataWrapper").append(office);
+            $(electionDivId).append(office);
 
             var candidates = contests[i].candidates;
-            console.log(candidates);
 
             // For each candidate running for office
             for(var j = 0; candidates && j < candidates.length; j++) {
@@ -238,28 +238,13 @@ $("#getCandidates").on("click", function(event) {
                 candInfo.append(cSocial);
               }
 
-
-              // LINK BROKEN-- NEED TO LOOK AT
-
-
-/*
               // Here's where we make the ajax call to OpenSecrets to look for their info
-var oSapiKey = "8dacce829b4fc0b4b9a29b711149324c"
-var oURL = "https://www.opensecrets.org/api/?method=candContrib&cid=H4LA05221&cycle=2016&apikey="
-var oSapiURL = oURL + oSapiKey
-$.ajax({
-  url: oSapiURL,
-  method: "GET"
-  }).done(function(response) {
-  electionList = response.elections;
-  console.log(electionList);
-  });*/
 
               // Get the OpenSecrets ID
-              var CID;
+              // Simple call without checking for combined names or states or anything
               var CID = getCID(candName, candParty);
-              // var tempState = electionList[i].ocdDivisionId.split("/");
-
+              // var tempState = electionList[h].ocdDivisionId.split("/");
+              // var CID;
               // // If this is a state or local election, pass over the name of the state
               // // in case of a name conflict.
               // if(tempState[2]) {
@@ -269,26 +254,100 @@ $.ajax({
               //   CID = getCID(candName, candParty);
               // }
 
+              // If there's a / or & in the name, it's two names (several states have "Governor & Lt. Gvn'r" on the
+              // same ticket).  In these cases we're going to have to find two different CIDs (CID and CID2).
 
-  // If there's a / or & in the name, it's two names (several states have "Governor & Lt. Gvn'r" on the
-  // same ticket).  In these cases we're going to have to find two different CIDs (CID and CID2).
+              // No CID, so just add the candidate info that we have
+              if(CID === 0) {
+                $(electionDivId).append(candInfo);
+              }
+              // If we have a valid CID, make the API call to OpenSecrets
+              else {
+                // Give the new candInfo div an ID based on the CID so we can
+                // add to it when the ajax call returns, then add it to the DOM.
+                candInfo.attr("id", "cand-" + CID);
+                $(electionDivId).append(candInfo);
 
+                // Make the OpenSecrets call
+                $.ajax({
+                  url: candContribURL + "&cid=" + CID,
+                  method: "GET",
+                  cID: CID
+                }).done(function(response) {
 
+                  // Whoever designed this API is an idiot
+                  var contributors = JSON.parse(response).response.contributors.contributor;
 
+                  var financeData = $("<div>", {"class" : "contributors"});
 
-              $(dataWrapper).append(candInfo);
+                  // If we have some contributors, insert a header row
+                  if(contributors.length > 0) {
+
+                    var headerRow = $("<div>", {"class" : "contribHeader"});
+
+                    var orgHeader = $("<span>", {
+                                      "class" : "contribOrg lbl",
+                                      "text" : "Organization"
+                                    });
+                    var totalHeader = $("<span>", {
+                                        "class" : "contribTotal lbl",
+                                        "text" : "Total Contributions"
+                                      });
+                    var pacsHeader = $("<span>", {
+                                        "class" : "contribPACS lbl",
+                                        "text" : "From PACs"
+                                      });
+                    var indivsHeader = $("<span>", {
+                                        "class" : "contribIndivs lbl",
+                                        "text" : "From Individuals"
+                                      });
+
+                    headerRow.append(orgHeader).append(totalHeader).append(pacsHeader).append(indivsHeader);
+                    financeData.append(headerRow);
+                  }
+
+                  // Loop through the contributors and append them to the finance info div
+                  for(var k = 0; k < contributors.length; k++) {
+
+                    // Making variables because this JSON structure makes me want to stab myself in the eye
+                    var org = contributors[k]["@attributes"].org_name;
+                    var total = contributors[k]["@attributes"].total;
+                    var pacs = contributors[k]["@attributes"].pacs;
+                    var indivs = contributors[k]["@attributes"].indivs;
+
+                    var contributor = $("<div>", {"class" : "contributor"});
+
+                    var orgSpan = $("<span>", {
+                                      "class" : "contribOrg",
+                                      "text" : org
+                                  });
+                    var totalSpan = $("<span>", {
+                                      "class" : "contribTotal",
+                                      "text" : "$" + total
+                                    });
+                    var pacsSpan = $("<span>", {
+                                      "class" : "contribPACS",
+                                      "text" : "$" + pacs
+                                    });
+                    var indivsSpan = $("<span>", {
+                                      "class" : "contribIndivs",
+                                      "text" : "$" + indivs
+                                    });
+
+                    contributor.append(orgSpan).append(totalSpan).append(pacsSpan).append(indivsSpan);
+                    financeData.append(contributor);
+                  }
+
+                  var thisCand = "#cand-" + this.cID;
+                  $(thisCand).append(financeData);
+                });
+              }
             }
           }
         }
       });
     }
   }
-
-
-
-
-
-
 });
 
 
@@ -313,8 +372,6 @@ $("#changeAddr").on("click", function() {
 // test local elections with.
 // divisionString is of the format "ocd-division/country:us/state:ca"
 function isApplicable(state, divisionString) {
-  console.log(state);
-  console.log(divisionString);
   var divisions = divisionString.split("/");
   // False if the election is not in the US
   if(divisions[1].substr(-2, 2) != "us") {
@@ -327,6 +384,7 @@ function isApplicable(state, divisionString) {
   // When we have better data, add more conditions to check for more local divisions like
   // cities, school districts, etc.  Don't know what they're called since there isn't any
   // data in the test DB for these.
+  console.log(divisionString);
   return true;
 }
 
@@ -345,13 +403,9 @@ function parseAddress() {
 
 // Returns pretty-print URL
 function formatURL(url) {
-  console.log("URL: " + url);
   var tempURL = url.replace("http://", "").replace("www.", "").replace(/[^/]+$/, "");
-  console.log("tempURL: " + tempURL);
   if(tempURL.substr(-1, 1) === '/') {
-
     tempURL = tempURL.substr(0, tempURL.length - 1);
-    console.log("tempAftr: " + tempURL);
   }
   return tempURL;
 }
