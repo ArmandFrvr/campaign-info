@@ -80,266 +80,264 @@ $("#getCandidates").on("click", function(event) {
 
       $("#dataWrapper").append(thisElection);
 
-      // Use closure to capture value of electionDivId while making the ajax call
-      (function(electionID) {
-        // Get detailed info for that election (polling location, contests, candidates)
-        $.ajax({
-          url: voterInfoURL + "&address=" + address + "&electionId=" + electionList[h].id,
-          method: "GET"
-        }).done(function(response) {
+      // Get detailed info for that election (polling location, contests, candidates)
+      $.ajax({
+        url: voterInfoURL + "&address=" + address + "&electionId=" + electionList[h].id,
+        method: "GET",
+        eID: electionDivId  // passing in the div's ID so we can add stuff to it asynchronously
+      }).done(function(response) {
 
-          var electionDivId = "#" + electionID;
+        var electionDivId = "#" + this.eID;
 
-          var contests = response.contests;
+        var contests = response.contests;
 
-          // If we don't have contests for some reason, don't do anything else here
-          if(!contests) {
-            var errMsg = $("<div>", {
-                            "class" : "lbl candidate",
-                            "text" : "No information found for this election."
-                          });
-            $(electionDivId).append(errMsg);
-            return;
-          }
+        // If we don't have contests for some reason, don't do anything else here
+        if(!contests) {
+          var errMsg = $("<div>", {
+                          "class" : "lbl candidate",
+                          "text" : "No information found for this election."
+                        });
+          $(electionDivId).append(errMsg);
+          return;
+        }
 
-          console.log(contests);
+        console.log(contests);
 
-          // Show their polling location info under the election name
-          var polls = response.pollingLocations;
+        // Show their polling location info under the election name
+        var polls = response.pollingLocations;
 
-          if(!!polls) {
-            for(var i = 0; i < polls.length; i++) {
+        if(!!polls) {
+          for(var i = 0; i < polls.length; i++) {
 
-              // If there is an address, display it
-              if(polls[i].address.line1 != "") {
-                var pollingLocation = $("<div>", {
-                                        "class" : "poll"
-                                       });
-                var locationLbl = $("<span>", {
-                                    "class" : "lbl",
-                                    "text" : "Polling location: "
-                                    });
-                var locationTxt = polls[i].address.line1 + ", " +
-                                  polls[i].address.city + ", " + polls[i].address.state +
-                                  " " + polls[i].address.zip;
-
-                pollingLocation.append(locationLbl);
-                pollingLocation.append(locationTxt);
-
-                // If the hours are known, display them also
-                if(polls[i].pollingHours != "") {
-                  var hoursLbl = $("<span>", {
+            // If there is an address, display it
+            if(polls[i].address.line1 != "") {
+              var pollingLocation = $("<div>", {
+                                      "class" : "poll"
+                                     });
+              var locationLbl = $("<span>", {
                                   "class" : "lbl",
-                                  "text" : "Hours: "
+                                  "text" : "Polling location: "
                                   });
-                  pollingLocation.append(" | ");
-                  pollingLocation.append(hoursLbl);
-                  pollingLocation.append(polls[i].pollingHours);
-                }
+              var locationTxt = polls[i].address.line1 + ", " +
+                                polls[i].address.city + ", " + polls[i].address.state +
+                                " " + polls[i].address.zip;
 
-                $(electionDivId).append(pollingLocation);
-              }
-            }
-          }
+              pollingLocation.append(locationLbl);
+              pollingLocation.append(locationTxt);
 
-          // For each contest in this election
-          for(var i = 0; i < contests.length; i++) {
-
-            // If this is actually a contest and not a proposition/referendum
-              // Sample dataset only has "General" and "Referendum".  Will need to
-              // verify this when the 2018 data is available & see if anything else
-              // needs to be inclded.
-            if(contests[i].type == "General") {
-
-              // Display the name of the contest (office that's up for election)
-              var office = $("<h3>", {
-                              "class" : "office",
-                              "text" : contests[i].office
-                            });
-              $(electionDivId).append(office);
-
-              var candidates = contests[i].candidates;
-
-              // For each candidate running for office
-              for(var j = 0; candidates && j < candidates.length; j++) {
-                var candName = candidates[j].name;
-                var candParty = candidates[j].party;
-                var candURL = candidates[j].candidateUrl;
-                var socialMedia = candidates[j].channels; // array of social media types and links
-                // Display the candidates's info (name & party)
-                var candInfo = $("<div>", {
-                                  "class" : "candidate"
+              // If the hours are known, display them also
+              if(polls[i].pollingHours != "") {
+                var hoursLbl = $("<span>", {
+                                "class" : "lbl",
+                                "text" : "Hours: "
                                 });
-                var cName = $("<span>", {
-                                "class" : "candName",
-                                "text" : candName
-                              });
-                var cParty = $("<span>", {
-                                "class" : "candParty",
-                                "text" : candParty
-                              });
-                candInfo.append(cName);
-                candInfo.append(cParty);
-
-                // Display link to their website
-                var cURL = $("<span>"); // Candidate URL span
-                if(!!candURL) {
-                  cURL.attr("class", "candURL");
-                  // Need to make the link
-                  var cLink = $("<a>", {
-                    "href" : candURL,
-                    "text" : formatURL(candURL),
-                    "target" : "_blank"
-                  });
-                  cURL.append(cLink);
-                }
-                else {
-                  cURL.attr("class", "spacer");   // if no url, make a placeholder for spacing
-                }
-                candInfo.append(cURL);
-
-                // Display links to their social media channels
-                if(!!socialMedia) {
-
-                  var cSocial = $("<span>", { // Social media span
-                  "class" : "candSocial"
-                  });
-
-                  for(var k = 0; k < socialMedia.length; k++) {
-                    var smIcon = (function (smType) {
-                                    switch(smType) {
-                                      case "Twitter":
-                                        return $('<i class="fa fa-twitter" title="' + candName
-                                          + '\'s Twitter"><span class="accessible">'
-                                          + candName + '\'s Twitter</span></i>');
-                                      case "YouTube":
-                                        return $('<i class="fa fa-youtube" title="' + candName
-                                          + '\'s YouTube"><span class="accessible">'
-                                         + candName + '\'s YouTube</span></i>');
-                                      case "Facebook":
-                                        return $('<i class="fa fa-facebook" title="' + candName
-                                          + '\'s Facebook"><span class="accessible">'
-                                         + candName + '\'s Facebook</span></i>');
-                                      case "GooglePlus":
-                                        return $('<i class="fa fa-google-plus" title="' + candName
-                                          + '\'s Google Plus"><span class="accessible">'
-                                         + candName + '\'s Google Plus</span></i>');
-                                      default:
-                                        return "";
-                                    }
-                                  })(socialMedia[k].type);
-                    var smLink = $("<a>", {
-                                    "href" : socialMedia[k].id,
-                                    "class" : "smLink",
-                                    "target" : "_blank"
-                                  });
-                    smLink.append(smIcon);
-                    cSocial.append(smLink);
-                  }
-                  candInfo.append(cSocial);
-                }
-
-                // Here's where we make the ajax call to OpenSecrets to look for their info
-
-                // Get the OpenSecrets ID
-                // Simple call without checking for combined names or states or anything
-                var CID = getCID(candName, candParty);
-                // var tempState = electionList[h].ocdDivisionId.split("/");
-                // var CID;
-                // // If this is a state or local election, pass over the name of the state
-                // // in case of a name conflict.
-                // if(tempState[2]) {
-                //   CID = getCID(candName, candParty, tempState[2].substr(-2, 2));
-                // }
-                // else { // Otherwise just the name and party
-                //   CID = getCID(candName, candParty);
-                // }
-
-                // If there's a / or & in the name, it's two names (several states have "Governor & Lt. Gvn'r" on the
-                // same ticket).  In these cases we're going to have to find two different CIDs (CID and CID2).
-
-                // If we have a valid CID, make the API call to OpenSecrets
-                if(CID !== 0) {
-
-                  $.ajax({
-                    url: candContribURL + "&cid=" + CID,
-                    method: "GET",
-                    async: false
-                  }).done(function(response) {
-
-                    // Whoever designed this API is an idiot
-                    var contributors = JSON.parse(response).response.contributors.contributor;
-
-                    var financeData = $("<div>", {"class" : "contributors"});
-
-                    // If we have some contributors, insert a header row
-                    if(contributors.length > 0) {
-
-                      var headerRow = $("<div>", {"class" : "contribHeader"});
-
-                      var orgHeader = $("<span>", {
-                                        "class" : "contribOrg lbl",
-                                        "text" : "Organization"
-                                      });
-                      var totalHeader = $("<span>", {
-                                          "class" : "contribTotal lbl",
-                                          "text" : "Total Contributions"
-                                        });
-                      var pacsHeader = $("<span>", {
-                                          "class" : "contribPACS lbl",
-                                          "text" : "From PACs"
-                                        });
-                      var indivsHeader = $("<span>", {
-                                          "class" : "contribIndivs lbl",
-                                          "text" : "From Individuals"
-                                        });
-
-                      headerRow.append(orgHeader).append(totalHeader).append(pacsHeader).append(indivsHeader);
-                      financeData.append(headerRow);
-                    }
-
-                    // Loop through the contributors and append them to the finance info div
-                    for(var k = 0; k < contributors.length; k++) {
-
-                      // Making variables because this JSON structure makes me want to stab myself in the eye
-                      var org = contributors[k]["@attributes"].org_name;
-                      var total = contributors[k]["@attributes"].total;
-                      var pacs = contributors[k]["@attributes"].pacs;
-                      var indivs = contributors[k]["@attributes"].indivs;
-
-                      var contributor = $("<div>", {"class" : "contributor"});
-
-                      var orgSpan = $("<span>", {
-                                        "class" : "contribOrg",
-                                        "text" : org
-                                    });
-                      var totalSpan = $("<span>", {
-                                        "class" : "contribTotal",
-                                        "text" : "$" + total
-                                      });
-                      var pacsSpan = $("<span>", {
-                                        "class" : "contribPACS",
-                                        "text" : "$" + pacs
-                                      });
-                      var indivsSpan = $("<span>", {
-                                        "class" : "contribIndivs",
-                                        "text" : "$" + indivs
-                                      });
-
-                      contributor.append(orgSpan).append(totalSpan).append(pacsSpan).append(indivsSpan);
-                      financeData.append(contributor);
-                    }
-
-                    candInfo.append(financeData);
-                  });
-                }
-
-                $(electionDivId).append(candInfo);
+                pollingLocation.append(" | ");
+                pollingLocation.append(hoursLbl);
+                pollingLocation.append(polls[i].pollingHours);
               }
+
+              $(electionDivId).append(pollingLocation);
             }
           }
-        });
-      })(electionDivId);
+        }
+
+        // For each contest in this election
+        for(var i = 0; i < contests.length; i++) {
+
+          // If this is actually a contest and not a proposition/referendum
+            // Sample dataset only has "General" and "Referendum".  Will need to
+            // verify this when the 2018 data is available & see if anything else
+            // needs to be inclded.
+          if(contests[i].type == "General") {
+
+            // Display the name of the contest (office that's up for election)
+            var office = $("<h3>", {
+                            "class" : "office",
+                            "text" : contests[i].office
+                          });
+            $(electionDivId).append(office);
+
+            var candidates = contests[i].candidates;
+
+            // For each candidate running for office
+            for(var j = 0; candidates && j < candidates.length; j++) {
+              var candName = candidates[j].name;
+              var candParty = candidates[j].party;
+              var candURL = candidates[j].candidateUrl;
+              var socialMedia = candidates[j].channels; // array of social media types and links
+              // Display the candidates's info (name & party)
+              var candInfo = $("<div>", {
+                                "class" : "candidate"
+                              });
+              var cName = $("<span>", {
+                              "class" : "candName",
+                              "text" : candName
+                            });
+              var cParty = $("<span>", {
+                              "class" : "candParty",
+                              "text" : candParty
+                            });
+              candInfo.append(cName);
+              candInfo.append(cParty);
+
+              // Display link to their website
+              var cURL = $("<span>"); // Candidate URL span
+              if(!!candURL) {
+                cURL.attr("class", "candURL");
+                // Need to make the link
+                var cLink = $("<a>", {
+                  "href" : candURL,
+                  "text" : formatURL(candURL),
+                  "target" : "_blank"
+                });
+                cURL.append(cLink);
+              }
+              else {
+                cURL.attr("class", "spacer");   // if no url, make a placeholder for spacing
+              }
+              candInfo.append(cURL);
+
+              // Display links to their social media channels
+              if(!!socialMedia) {
+
+                var cSocial = $("<span>", { // Social media span
+                "class" : "candSocial"
+                });
+
+                for(var k = 0; k < socialMedia.length; k++) {
+                  var smIcon = (function (smType) {
+                                  switch(smType) {
+                                    case "Twitter":
+                                      return $('<i class="fa fa-twitter" title="' + candName
+                                        + '\'s Twitter"><span class="accessible">'
+                                        + candName + '\'s Twitter</span></i>');
+                                    case "YouTube":
+                                      return $('<i class="fa fa-youtube" title="' + candName
+                                        + '\'s YouTube"><span class="accessible">'
+                                       + candName + '\'s YouTube</span></i>');
+                                    case "Facebook":
+                                      return $('<i class="fa fa-facebook" title="' + candName
+                                        + '\'s Facebook"><span class="accessible">'
+                                       + candName + '\'s Facebook</span></i>');
+                                    case "GooglePlus":
+                                      return $('<i class="fa fa-google-plus" title="' + candName
+                                        + '\'s Google Plus"><span class="accessible">'
+                                       + candName + '\'s Google Plus</span></i>');
+                                    default:
+                                      return "";
+                                  }
+                                })(socialMedia[k].type);
+                  var smLink = $("<a>", {
+                                  "href" : socialMedia[k].id,
+                                  "class" : "smLink",
+                                  "target" : "_blank"
+                                });
+                  smLink.append(smIcon);
+                  cSocial.append(smLink);
+                }
+                candInfo.append(cSocial);
+              }
+
+              // Here's where we make the ajax call to OpenSecrets to look for their info
+
+              // Get the OpenSecrets ID
+              // Simple call without checking for combined names or states or anything
+              var CID = getCID(candName, candParty);
+              // var tempState = electionList[h].ocdDivisionId.split("/");
+              // var CID;
+              // // If this is a state or local election, pass over the name of the state
+              // // in case of a name conflict.
+              // if(tempState[2]) {
+              //   CID = getCID(candName, candParty, tempState[2].substr(-2, 2));
+              // }
+              // else { // Otherwise just the name and party
+              //   CID = getCID(candName, candParty);
+              // }
+
+              // If there's a / or & in the name, it's two names (several states have "Governor & Lt. Gvn'r" on the
+              // same ticket).  In these cases we're going to have to find two different CIDs (CID and CID2).
+
+              // If we have a valid CID, make the API call to OpenSecrets
+              if(CID !== 0) {
+
+                $.ajax({
+                  url: candContribURL + "&cid=" + CID,
+                  method: "GET",
+                  async: false
+                }).done(function(response) {
+
+                  // Whoever designed this API is an idiot
+                  var contributors = JSON.parse(response).response.contributors.contributor;
+
+                  var financeData = $("<div>", {"class" : "contributors"});
+
+                  // If we have some contributors, insert a header row
+                  if(contributors.length > 0) {
+
+                    var headerRow = $("<div>", {"class" : "contribHeader"});
+
+                    var orgHeader = $("<span>", {
+                                      "class" : "contribOrg lbl",
+                                      "text" : "Organization"
+                                    });
+                    var totalHeader = $("<span>", {
+                                        "class" : "contribTotal lbl",
+                                        "text" : "Total Contributions"
+                                      });
+                    var pacsHeader = $("<span>", {
+                                        "class" : "contribPACS lbl",
+                                        "text" : "From PACs"
+                                      });
+                    var indivsHeader = $("<span>", {
+                                        "class" : "contribIndivs lbl",
+                                        "text" : "From Individuals"
+                                      });
+
+                    headerRow.append(orgHeader).append(totalHeader).append(pacsHeader).append(indivsHeader);
+                    financeData.append(headerRow);
+                  }
+
+                  // Loop through the contributors and append them to the finance info div
+                  for(var k = 0; k < contributors.length; k++) {
+
+                    // Making variables because this JSON structure makes me want to stab myself in the eye
+                    var org = contributors[k]["@attributes"].org_name;
+                    var total = contributors[k]["@attributes"].total;
+                    var pacs = contributors[k]["@attributes"].pacs;
+                    var indivs = contributors[k]["@attributes"].indivs;
+
+                    var contributor = $("<div>", {"class" : "contributor"});
+
+                    var orgSpan = $("<span>", {
+                                      "class" : "contribOrg",
+                                      "text" : org
+                                  });
+                    var totalSpan = $("<span>", {
+                                      "class" : "contribTotal",
+                                      "text" : "$" + total
+                                    });
+                    var pacsSpan = $("<span>", {
+                                      "class" : "contribPACS",
+                                      "text" : "$" + pacs
+                                    });
+                    var indivsSpan = $("<span>", {
+                                      "class" : "contribIndivs",
+                                      "text" : "$" + indivs
+                                    });
+
+                    contributor.append(orgSpan).append(totalSpan).append(pacsSpan).append(indivsSpan);
+                    financeData.append(contributor);
+                  }
+
+                  candInfo.append(financeData);
+                });
+              }
+
+              $(electionDivId).append(candInfo);
+            }
+          }
+        }
+      });
     }
   }
 });
